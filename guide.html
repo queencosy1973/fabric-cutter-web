@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการทำงานแอดมิน (SOP) — ระบบคำนวณตัดผ้า & สั่งตัดนอก QueenCosy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .page-sheet {
+      background: #ffffff;
+      max-width: 210mm;
+      margin: 16px auto;
+      padding: 16mm 15mm;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+    }
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-sheet {
+        box-shadow: none;
+        margin: 0;
+        padding: 4mm 6mm;
+        max-width: 100%;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Bar (Hidden when printing/PDF) -->
+  <div class="no-print bg-slate-900 text-white sticky top-0 z-50 border-b border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="text-xl">📘</span>
+        <div>
+          <div class="text-sm font-bold">คู่มือปฏิบัติงานแอดมิน (Admin Routine SOP Guide)</div>
+          <div class="text-[11px] text-slate-400">ระบบคำนวณเบิกผ้าช่างตัด • ใบสั่งตัดนอก • ผ้าจับชุดตัด-เย็บ • ซิงค์ข้อมูลกลาง Supabase Cloud</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="QueenCosy_Admin_Guide.pdf" download="คู่มือการใช้งานแอดมิน_ระบบคำนวณตัดผ้า_QueenCosy.pdf"
+          class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow flex items-center gap-1.5">
+          📥 ดาวน์โหลดไฟล์ PDF
+        </a>
+        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow flex items-center gap-1.5">
+          🖨️ สั่งพิมพ์ / บันทึกเป็น PDF
+        </button>
+        <a href="index.html" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700">
+          ⬅ กลับหน้าโปรแกรมหลัก
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 1: SYSTEM OVERVIEW, LINKS & SHEET MAPPING                        -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet space-y-5">
+    <!-- Header Banner -->
+    <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-fuchsia-900 text-white p-5 rounded-2xl border border-indigo-700">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-950 uppercase tracking-wider mb-1.5">
+            STANDARD OPERATING PROCEDURE (SOP) • สำหรับแอดมินฝ่ายผลิตและสต็อกผ้า
+          </div>
+          <h1 class="text-xl font-bold tracking-tight">
+            คู่มือการใช้งานระบบคำนวณตัดผ้า & สั่งตัดนอก (QueenCosy)
+          </h1>
+          <p class="text-xs text-indigo-200 mt-1">
+            รวมงาน Routine จาก Google Sheets ทั้ง 3 ไฟล์เข้าสู่ระบบเว็บเดียว • คำนวณอัตโนมัติ • ซิงค์ข้อมูลสดทุกเครื่องผ่าน Cloud
+          </p>
+        </div>
+        <div class="text-right shrink-0 bg-white/10 px-3 py-2 rounded-xl border border-white/15">
+          <div class="text-[10px] text-indigo-200">มาตรฐานแปลงหน่วยผ้า</div>
+          <div class="text-sm font-extrabold text-amber-300">1 ม้วน = 50 หลา</div>
+          <div class="text-[10px] text-emerald-300 mt-0.5">● Auto Cloud Sync</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Web Links -->
+    <div class="space-y-2">
+      <h2 class="text-sm font-bold text-indigo-950 flex items-center gap-1.5 border-b-2 border-indigo-100 pb-1">
+        <span>🌐 1. ลิงก์เข้าใช้งานระบบ (เปิดได้ทั้งคอมพิวเตอร์ แท็บเล็ต และมือถือ)</span>
+      </h2>
+      <div class="grid grid-cols-3 gap-2.5 text-xs">
+        <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200">
+          <div class="font-bold text-indigo-950">🧵 1. ระบบคำนวณตัดผ้า (หน้าหลักแอดมิน)</div>
+          <div class="text-[11px] font-bold text-indigo-700 mt-1 break-all">https://fabric-cutter-web.vercel.app</div>
+          <div class="text-[10px] text-slate-600 mt-1">ใช้ทำใบเบิกผ้า, ใบสั่งตัดนอก, เช็คผ้าตัด-เย็บ, รีเช็คผ้าช่างนอก และคิดค่าแรงตัด</div>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+          <div class="font-bold text-amber-950">📦 2. ระบบคลังสินค้ากลาง (Stock Movement)</div>
+          <div class="text-[11px] font-bold text-amber-700 mt-1 break-all">https://stock-movement-app.vercel.app</div>
+          <div class="text-[10px] text-slate-600 mt-1">ใช้ดูสต็อกผ้าม้วนคงเหลือในคลังโรงงาน และประวัติรับเข้า-เบิกออกทั้งหมด</div>
+        </div>
+        <div class="p-3 rounded-xl bg-fuchsia-50 border border-fuchsia-200">
+          <div class="font-bold text-fuchsia-950">📐 3. ระบบวางแผนการผลิต (BOM Planner)</div>
+          <div class="text-[11px] font-bold text-fuchsia-700 mt-1 break-all">https://bom-planner-web.vercel.app</div>
+          <div class="text-[10px] text-slate-600 mt-1">ใช้คำนวณวัตถุดิบทั้งหมดตามสูตร Master BOM (ไม้, ฟองน้ำ, ผ้า, ฮาร์ดแวร์)</div>
+        </div>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2 text-[11px] text-emerald-900 flex items-center justify-between">
+        <span>💡 <strong>จุดเด่นสำคัญ:</strong> ทุกครั้งที่แอดมินคีย์ตัวเลขในตาราง ระบบจะบันทึกและซิงค์ขึ้น <strong>ฐานข้อมูลกลาง (Supabase Cloud)</strong> อัตโนมัติทันที เปิดดูจากเครื่องไหนก็เห็นข้อมูลตรงกัน 100%</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-700 text-white font-bold text-[10px] shrink-0 ml-2">ซิงค์สดอัตโนมัติ</span>
+      </div>
+    </div>
+
+    <!-- Section 2: Mapping Old Google Sheets to New Tabs -->
+    <div class="space-y-2">
+      <h2 class="text-sm font-bold text-indigo-950 flex items-center gap-1.5 border-b-2 border-indigo-100 pb-1">
+        <span>🗺️ 2. ตารางเทียบ "ชีตงานเดิมของแอดมิน (3 ไฟล์)" ➔ "แท็บเมนูในระบบใหม่"</span>
+      </h2>
+      <table class="w-full text-left border-collapse text-[11px] border border-slate-300 rounded-xl overflow-hidden">
+        <thead>
+          <tr class="bg-slate-800 text-white">
+            <th class="py-2 px-2.5 w-1/3">ไฟล์ Google Sheets เดิมของแอดมิน</th>
+            <th class="py-2 px-2.5 w-1/3">แท็บเมนูในระบบใหม่ (fabric-cutter-web)</th>
+            <th class="py-2 px-2.5">สิ่งที่ระบบทำให้โดยอัตโนมัติ</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <tr class="bg-indigo-50/40">
+            <td class="py-2 px-2.5 font-bold text-slate-900">
+              1. ไฟล์ "ใบเบิกผ้า ช่างตัด 69"<br>
+              <span class="text-[10px] font-normal text-slate-600">(แท็บ พ.ย รอบที่ 1, 2, 3 และ สูตรคุณบุญ)</span>
+            </td>
+            <td class="py-2 px-2.5 font-bold text-indigo-800">
+              📋 แท็บ 1: ใบเบิกผ้าช่างตัด & ใบสั่งตัดนอก<br>
+              <span class="text-[10px] font-semibold text-indigo-600">➔ เลือก "มุมมองที่ 1: ตารางคำนวณเบิกผ้า"</span>
+            </td>
+            <td class="py-2 px-2.5 text-slate-700">
+              คูณหลาตามรุ่น, แปลงเป็นม้วน (เลือกสูตรปกติ ÷50 หรือสูตรคุณบุญได้), คำนวณค่าผ้า, คำนวณผ้าคงเหลือเทียบ <strong>#ช่างนอก</strong> และคิดค่าแรงตัด (10/8/20/30฿)
+            </td>
+          </tr>
+          <tr>
+            <td class="py-2 px-2.5 font-bold text-slate-900">
+              2. ไฟล์ "สั่งตัดนอก"<br>
+              <span class="text-[10px] font-normal text-slate-600">(ใบสั่งผลิตแยก L-mini ซ้าย/ขวา, ตัดอะไหล่เพิ่ม, เช็คบิล)</span>
+            </td>
+            <td class="py-2 px-2.5 font-bold text-fuchsia-800">
+              📋 แท็บ 1: เลือก "มุมมองที่ 2: ใบสั่งผลิตส่งช่างนอก"<br>
+              📊 แท็บ 3: บิลค่าตัด & ทะเบียนตัดอะไหล่เพิ่ม
+            </td>
+            <td class="py-2 px-2.5 text-slate-700">
+              ไม่ต้องคีย์ใบสั่งตัดนอกซ้ำ! ระบบดึงยอดจากใบเบิกผ้ามาสร้างใบสั่งตัดนอก (แยก L-mini ซ้าย/ขวา และซ่อนราคาผ้า) พร้อมพิมพ์ส่งช่างได้ทันที
+            </td>
+          </tr>
+          <tr class="bg-rose-50/40">
+            <td class="py-2 px-2.5 font-bold text-slate-900">
+              3. ไฟล์ "ตรวจสอบการทำงานช่างเดือน 11.69"<br>
+              <span class="text-[10px] font-normal text-slate-600">(แท็บ ผ้าจับชุดตัด-เย็บ, ผ้าเหลือน้อย, สต็อกโครงไม้)</span>
+            </td>
+            <td class="py-2 px-2.5 font-bold text-rose-800">
+              🧵 แท็บ 2: ผ้าจับชุดตัด-เย็บ & เช็คโครง/ช่างหุ้ม
+            </td>
+            <td class="py-2 px-2.5 text-slate-700">
+              รวมยอด <strong>(ไม่เย็บ + เย็บแล้ว) - หัก Pre-Order</strong> ถ้ารุ่นไหนสีไหน <strong>ติดลบ (-)</strong> กดปุ่มเดียวส่งยอดที่ขาดเข้าตารางเบิกผ้า (แท็บ 1) ได้ทันที!
+            </td>
+          </tr>
+          <tr>
+            <td class="py-2 px-2.5 font-bold text-slate-900">
+              4. แท็บ "แยกPre-Order ตัด พ.ย / ต.ค"<br>
+              <span class="text-[10px] font-normal text-slate-600">(ในไฟล์ใบเบิกผ้า ช่างตัด 69)</span>
+            </td>
+            <td class="py-2 px-2.5 font-bold text-emerald-800">
+              📊 แท็บ 3: รีพอร์ต Pre-Order (ขา/เกียร์) & บิลค่าตัด
+            </td>
+            <td class="py-2 px-2.5 text-slate-700">
+              รวมยอดตัว, คำนวณหลา/ม้วน, คำนวณ <strong>ขาโซฟา 1" (×6 ขา แปลงเป็นถุง ÷500)</strong> และ <strong>เกียร์ปรับนอน (×1 คู่ แปลงเป็นลัง ÷15)</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3: Master Formula Cheat Sheet -->
+    <div class="space-y-2">
+      <h2 class="text-sm font-bold text-indigo-950 flex items-center gap-1.5 border-b-2 border-indigo-100 pb-1">
+        <span>📐 3. ตารางสูตรการใช้ผ้า & อัตราค่าแรงช่างตัดมาตรฐานที่ตั้งไว้ในระบบ</span>
+      </h2>
+      <table class="w-full text-center border-collapse text-[11px] border border-slate-300">
+        <thead>
+          <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300">
+            <th class="py-1.5 px-2 text-left">คอลัมน์รุ่นที่สั่งตัด</th>
+            <th class="py-1.5 px-2">CS2 / 2PL</th>
+            <th class="py-1.5 px-2">CS3 / 3PL<br><span class="text-[9px] font-normal">(เฉพาะตัว)</span></th>
+            <th class="py-1.5 px-2">เฉพาะแขน<br><span class="text-[9px] font-normal">(แขน New)</span></th>
+            <th class="py-1.5 px-2">RS<br>หัวกระดก</th>
+            <th class="py-1.5 px-2">LN3<br>กระดุม 19 เม็ด</th>
+            <th class="py-1.5 px-2">LN<br>กระดุม 5 เม็ด</th>
+            <th class="py-1.5 px-2">PN Lit<br>ปรับนอน</th>
+            <th class="py-1.5 px-2 bg-fuchsia-50 text-fuchsia-900">L Mini<br><span class="text-[9px] font-normal">(ซ้าย/ขวา)</span></th>
+            <th class="py-1.5 px-2">L ใหญ่</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <tr>
+            <td class="py-1.5 px-2 text-left font-bold bg-slate-50">ปริมาณผ้าที่ใช้ (หลา/ตัว)</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">3.20 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">4.33 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">1.93 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">6.26 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">6.21 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">6.17 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">6.65 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-fuchsia-700 bg-fuchsia-50/50">8.97 หลา</td>
+            <td class="py-1.5 px-2 font-bold text-indigo-700">11.00 หลา</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 px-2 text-left font-bold bg-slate-50">สัดส่วน 1 ม้วน (50 หลา) : ตัว</td>
+            <td class="py-1.5 px-2">1 : 15 ตัว</td>
+            <td class="py-1.5 px-2">1 : 11 ตัว</td>
+            <td class="py-1.5 px-2">1 : 25 คู่</td>
+            <td class="py-1.5 px-2">1 : 7 ตัว</td>
+            <td class="py-1.5 px-2">1 : 8 ตัว</td>
+            <td class="py-1.5 px-2">1 : 8 ตัว</td>
+            <td class="py-1.5 px-2">1 : 7 ตัว</td>
+            <td class="py-1.5 px-2 bg-fuchsia-50/50">1 : 5 ตัว</td>
+            <td class="py-1.5 px-2">1 : 4 ตัว</td>
+          </tr>
+          <tr class="bg-emerald-50/60">
+            <td class="py-1.5 px-2 text-left font-bold">ค่าแรงช่างตัดผ้า (บาท/ตัว)</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">10 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">10 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">8 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">20 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">20 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">20 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">20 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">30 ฿</td>
+            <td class="py-1.5 px-2 font-bold text-emerald-800">30 ฿</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 2: STEP-BY-STEP ADMIN ROUTINE WORKFLOW (5 STEPS)                 -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet page-break space-y-4">
+    <div class="border-b-2 border-indigo-600 pb-2 flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-bold text-slate-900">🔄 ขั้นตอนการทำงาน Routine ประจำรอบของแอดมิน (5 ขั้นตอนง่ายๆ)</h2>
+        <p class="text-xs text-slate-500">ลำดับการทำงานตั้งแต่เช็คสต็อกผ้าตัด-เย็บ ➔ คำนวณเบิกผ้า ➔ ออกใบสั่งตัดนอก ➔ รีเช็คผ้าคงเหลือช่างนอก</p>
+      </div>
+      <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold">หน้า 2 / 2</span>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="p-3.5 rounded-2xl border-2 border-rose-200 bg-rose-50/30 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-bold">ขั้นตอนที่ 1 • เช็คสต็อกผ้าตัด-เย็บ หักยอด Pre-Order (แท็บ 2)</span>
+        <span class="text-[11px] font-semibold text-rose-700">แทนชีต "ผ้าจับชุดตัด-เย็บ"</span>
+      </div>
+      <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1 pt-1">
+        <li>กดไปที่เมนู <strong>"🧵 2. ผ้าจับชุดตัด-เย็บ & เช็คโครง/ช่างหุ้ม"</strong></li>
+        <li>คีย์อัปเดตจำนวนผ้าตัดแล้วในโรงงาน ช่อง <strong>"ไม่เย็บ (ชุด)"</strong>, <strong>"เย็บแล้ว (ชุด)"</strong> และช่อง <strong>"หัก Pre-Order (ชุด)"</strong> (สำหรับรุ่น L-mini คีย์แยกฝั่ง <strong>ซ้าย L / ขวา R</strong> ได้ในตารางด้านล่าง)</li>
+        <li>ระบบจะคำนวณช่อง <strong>"**คงเหลือหลังหัก Order"</strong> ให้อัตโนมัติ ถ้ารายการไหน <strong>ติดลบ (สีแดง)</strong> แปลว่าสต็อกผ้าตัดแล้วไม่พอ ต้องสั่งช่างนอกตัดเพิ่ม</li>
+        <li>กดปุ่มสีแดง <strong>"🚀 ส่งยอดที่ติดลบทั้งหมดเข้าใบเบิกผ้าช่างตัด (แท็บ 1)"</strong> (หรือกดปุ่ม <em>"➕ สั่งตัดเพิ่ม"</em> รายสี) ระบบจะส่งตัวเลขที่ขาดทั้งหมดไปกรอกลงในตารางใบเบิกผ้า (แท็บ 1) ให้ทันทีโดยไม่ต้องพิมพ์ใหม่!</li>
+      </ol>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="p-3.5 rounded-2xl border-2 border-indigo-200 bg-indigo-50/30 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-xs font-bold">ขั้นตอนที่ 2 • คำนวณใบเบิกผ้า & เลือกสูตรม้วน (แท็บ 1 - มุมมองที่ 1)</span>
+        <span class="text-[11px] font-semibold text-indigo-700">แทนชีต "ใบเบิกผ้า ช่างตัด 69"</span>
+      </div>
+      <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1 pt-1">
+        <li>ในเมนู <strong>"📋 1. ใบเบิกผ้าช่างตัด & ใบสั่งตัดนอก"</strong> เลือกรอบตัดผ้าที่ต้องการ (หรือกดปุ่มสีเขียว <strong>"➕ สร้างรอบตัดผ้าใหม่ (ยกยอดคงเหลือ)"</strong> เพื่อเปิดรอบใหม่โดยดึงยอดคงเหลือช่างนอกจากรอบก่อนมาเป็นยอดยกมาอัตโนมัติ)</li>
+        <li>คีย์หรือแก้ไขจำนวนตัวที่ต้องการสั่งตัดในแต่ละรุ่น (สำหรับคอลัมน์ <strong>L Mini</strong> มี 2 ช่องคู่กันคือ <strong>ช่องซ้าย L</strong> และ <strong>ช่องขวา R</strong> ระบบจะรวมหลาให้อัตโนมัติ)</li>
+        <li>เลือกสูตรคำนวณม้วนได้ที่ช่องด้านบน:
+          <ul class="list-disc list-inside ml-4 text-[11px] text-slate-600">
+            <li><strong>สูตรมาตรฐานแอดมิน:</strong> <code>รวมเบิกหลา ÷ 50</code></li>
+            <li><strong>สูตรคุณบุญ:</strong> คำนวณม้วนแยกตามสัดส่วนรุ่น (<code>1:15, 1:11, 1:25, 1:7, 1:8, 1:5</code>) แล้วรวมจำนวนม้วน</li>
+          </ul>
+        </li>
+        <li>กรอกช่อง <strong>"หักผ้าที่มี / สั่ง+เผื่อผ้าให้ช่างตัด"</strong> (เช่น <code>7 ม้วน</code>, <code>3 ม้วน TODA</code>, <code>5 ม้วน MJ</code>, <code>ใช้ผ้าที่มี</code>) และช่อง <strong>"จำนวนหลาที่ส่งจริง"</strong> (เช่น บิลโรงงานผ้า MJ/PKD ส่งจริง <code>152.60</code> หรือ <code>639.00</code> หลา)</li>
+        <li>ดูแถวสรุปด้านล่างสุดของตาราง: ระบบรวม <strong>จำนวนผลิต/ชุด</strong>, <strong>ราคารวมยอดสั่งผ้า (บาท)</strong>, และ <strong>ราคารวมยอดสั่งตัด (ค่าแรงช่างตัดผ้า)</strong> ให้ครบถ้วนทันที</li>
+      </ol>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="p-3.5 rounded-2xl border-2 border-fuchsia-200 bg-fuchsia-50/30 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-full bg-fuchsia-600 text-white text-xs font-bold">ขั้นตอนที่ 3 • ออกใบสั่งผลิตส่งช่างตัดนอก & ส่งออกไฟล์ Excel (แท็บ 1 - มุมมองที่ 2)</span>
+        <span class="text-[11px] font-semibold text-fuchsia-700">แทนชีต "สั่งตัดนอก"</span>
+      </div>
+      <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1 pt-1">
+        <li>กดปุ่มสลับมุมมอง <strong>"🖨️ มุมมองที่ 2: ใบสั่งผลิตส่งช่างตัดนอก (แยก L-mini ซ้าย/ขวา • ซ่อนราคาผ้า)"</strong></li>
+        <li>ระบบจะจัดหน้าตารางใหม่เหมือนชีต <em>"สั่งตัดนอก"</em> (ไม่มีคอลัมน์ราคาผ้า และแยกคอลัมน์ <strong>L-mini ซ้าย (L) / ขวา (R)</strong> ชัดเจน) พร้อมช่องพิมพ์หมายเหตุสั่งช่างท้ายแถว (เช่น <em>"L-mini ใช้ 337-29 ถ้าผ้าเหลือตัดรุ่นอื่นได้เลยค่ะ"</em>)</li>
+        <li>กดปุ่ม <strong>"🖨️ พิมพ์ใบสั่งตัดนอก"</strong> เพื่อปริ้นท์/เซฟ PDF ส่งไลน์ให้ช่างตัด หรือกดปุ่ม <strong>"📥 ส่งออก Excel (.xlsx)"</strong> เพื่อดาวน์โหลดไฟล์ Excel ที่มีครบทั้งแท็บใบเบิกผ้าและแท็บใบสั่งตัดนอก</li>
+      </ol>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="p-3.5 rounded-2xl border-2 border-amber-200 bg-amber-50/40 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-full bg-amber-600 text-white text-xs font-bold">ขั้นตอนที่ 4 • รีเช็คผ้าคงเหลือ #ช่างนอก หลังตัดเสร็จ & ซิงค์เข้าคลังกลาง</span>
+        <span class="text-[11px] font-semibold text-amber-800">ควบคุมเศษผ้าค้างที่ช่าง</span>
+      </div>
+      <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1 pt-1">
+        <li>เมื่อช่างนอกตัดผ้าเสร็จและแจ้งยอดผ้าที่เหลือกลับมา ให้แอดมินกรอกในคอลัมน์ <strong>"คงเหลือ/หลา #ช่างนอก"</strong> (พิมพ์ได้ทั้งตัวเลขหรือข้อความ เช่น <code>60.4+เศษกลาง</code>, <code>29+เศษ</code>, <code>103.90</code>, <code>0.00</code>)</li>
+        <li>เทียบกับคอลัมน์ <strong>"จำนวนผ้า/หลา คงเหลือตามสูตร"</strong> แล้วเลือกสถานะในคอลัมน์ <strong>"หมายเหตุ รีเช็ค"</strong> (<code>✅ ตรง</code>, <code>❌ ไม่ตรง</code>, <code>⚠️ น้อยกว่า</code>, <code>📈 มากกว่า</code>, <code>≈ ประมาณ</code>, <code>📦 ซับส่ง 1 ม้วน</code>)</li>
+        <li>กดปุ่มสีน้ำเงิน <strong>"🚀 ซิงค์ยอดคงเหลือช่างเข้าคลังกลาง"</strong> ระบบจะอัปเดตยอดเศษผ้าสะสมที่ฝากไว้ที่ช่างนอกในระบบกลางและซิงค์ขึ้น Cloud ทันที</li>
+      </ol>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="p-3.5 rounded-2xl border-2 border-emerald-200 bg-emerald-50/30 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-bold">ขั้นตอนที่ 5 • เช็คบิลค่าตัดรายเดือน, สั่งตัดอะไหล่เพิ่ม & คำนวณขา/เกียร์ (แท็บ 3)</span>
+        <span class="text-[11px] font-semibold text-emerald-800">งานสรุปรายงาน & ฮาร์ดแวร์</span>
+      </div>
+      <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1 pt-1">
+        <li>กดไปที่เมนู <strong>"📊 3. รีพอร์ต Pre-Order (ขา/เกียร์) & บิลค่าตัด"</strong></li>
+        <li><strong>ตารางที่ 1 (รีพอร์ต Pre-Order):</strong> ดูสรุปยอดตัว, จำนวนหลา/ม้วน, <strong>จำนวนขาโซฟา 1" (ตัว × 6 ขา ➔ แปลงเป็นถุงละ 500 ขา)</strong> และ <strong>เกียร์ปรับนอน (ตัว × 1 คู่ ➔ แปลงเป็นลังละ 15 คู่)</strong></li>
+        <li><strong>ตารางที่ 2 (เช็คยอดบิลค่าแรงตัดร้านดอนเมือง):</strong> ดูสรุปยอดชุดที่ตัด, ค่าแรงช่างตัดรวมแต่ละรอบ และสรุปยอดหลาผ้าที่ใช้แยกตาม 4 ชนิดผ้า (<code>PVC</code>, <code>ลูกฟูก</code>, <code>ฮอลแลนด์</code>, <code>นาโน</code>)</li>
+        <li><strong>ตารางที่ 3 (ทะเบียนสั่งตัดอะไหล่ชิ้นส่วนที่ขาดเพิ่ม):</strong> บันทึกและติดตามงานสั่งช่างตัดชิ้นส่วนอะไหล่เพิ่มจากเศษผ้าที่มี (เช่น <em>หลังพิง #2, ปิดหลัง #9, ที่นั่ง L-mini #18</em>)</li>
+      </ol>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
+      <div>เอกสารคู่มือปฏิบัติงานมาตรฐาน (SOP) • QueenCosy Production & Fabric Management System</div>
+      <div>อัปเดตล่าสุด: พฤศจิกายน 2569 • ซิงค์ข้อมูลผ่าน Supabase Cloud</div>
+    </div>
+  </div>
+
+</body>
+</html>
