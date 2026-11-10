@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบคำนวณการส่งผ้า-ตัดผ้าช่างนอก & สต็อกผ้าม้วน (Fabric Outsource & Roll Monitor) | QueenCosy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .tab-btn.active {
+      background-color: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Navigation & Sync Status Header -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-2xl shadow-lg">
+          🧵
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">QueenCosy Fabric Roll & Outsource Cutter</h1>
+            <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+              1 ม้วน = 50 หลา
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">
+            ระบบคำนวณการส่งผ้า-ตัดผ้าตาม BOM (แปลงหลา ➔ ม้วน) • คุมเศษผ้าช่างนอก • ตรวจนับผ้าตัดส่งกลับ • ซิงค์ Stock Movement
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-950/90 text-emerald-300 border border-emerald-700/60">
+          <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sync-status-text">ซิงค์สดทุกอุปกรณ์ (Supabase Cloud)</span>
+        </span>
+        <button id="btn-force-cloud-sync" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 border border-indigo-700 transition flex items-center gap-1.5" title="ดึงและอัปเดตข้อมูลล่าสุดกับฐานข้อมูลกลาง Supabase">
+          ☁️ ซิงค์ Cloud
+        </button>
+        <a id="link-stock-movement" href="https://stock-movement-app.vercel.app/" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition flex items-center gap-1.5">
+          📦 เปิด Stock Movement
+        </a>
+        <a id="link-bom-planner" href="https://bom-planner-web.vercel.app/" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-fuchsia-300 border border-slate-700 transition flex items-center gap-1.5">
+          📐 เปิด BOM Planner
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Loop Workflow Visual Banner -->
+    <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-fuchsia-950 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-indigo-800/40 no-print">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-indigo-300 font-semibold mb-1">
+            🔄 วงจรควบคุมการส่งผ้าให้ช่างนอกตัด (Weekly Closed-Loop Control)
+          </div>
+          <div class="text-sm sm:text-base font-medium text-slate-100">
+            วางแผนออเดอร์รายวัน (รวมเป็นสัปดาห์) ➔ คำนวณผ้าตาม BOM (หลา) แปลงเป็นม้วน (50 หลา/ม้วน) ➔ หักเศษผ้าค้างที่ช่าง & ตัดสต็อกส่งม้วน ➔ ตรวจนับชุดผ้าตัดส่งกลับครบตามรุ่น
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btn-quick-receive-roll" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow transition flex items-center gap-1.5">
+            ➕ รับผ้าม้วนเข้าคลังใหม่
+          </button>
+          <button id="btn-reset-demo" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition">
+            🔄 รีเซ็ตข้อมูลตัวอย่าง
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 4 KPI Cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+      <!-- Card 1: Warehouse Fabric Stock -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">📦 สต็อกผ้าในคลังโรงงาน</span>
+          <span id="kpi-low-stock-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">ปกติ</span>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-warehouse-rolls" class="text-2xl font-bold text-slate-900">0</span>
+          <span class="text-sm font-semibold text-indigo-600">ม้วน</span>
+          <span class="text-xs text-slate-400">(<span id="kpi-warehouse-yards">0</span> หลา)</span>
+        </div>
+        <p class="mt-1 text-[11px] text-slate-500">
+          ซิงค์ตรงกับหมวด "ผ้าม้วน" ใน Stock Movement
+        </p>
+      </div>
+
+      <!-- Card 2: This Week Plan Demand -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">📅 แผนใช้ผ้าสัปดาห์นี้ (BOM)</span>
+          <span id="kpi-plan-skus-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">0 รายการ</span>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-plan-yards" class="text-2xl font-bold text-indigo-700">0</span>
+          <span class="text-sm font-semibold text-indigo-600">หลา</span>
+          <span class="text-xs text-slate-500">≈ <strong id="kpi-plan-rolls-send" class="text-fuchsia-700">0</strong> ม้วนส่งช่าง</span>
+        </div>
+        <p class="mt-1 text-[11px] text-slate-500">
+          คิดเป็น <span id="kpi-plan-exact-rolls">0.00</span> ม้วนตามสูตร (หักเศษผ้าที่ช่างแล้ว)
+        </p>
+      </div>
+
+      <!-- Card 3: Remnant Fabric at External Cutter -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">🤝 เศษผ้าสะสมฝากที่ช่างนอก</span>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">หักลบรอบถัดไป</span>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-cutter-yards" class="text-2xl font-bold text-amber-600">0</span>
+          <span class="text-sm font-semibold text-amber-600">หลา</span>
+          <span class="text-xs text-slate-400">(<span id="kpi-cutter-rolls">0.00</span> ม้วน)</span>
+        </div>
+        <p class="mt-1 text-[11px] text-slate-500">
+          ผ้าที่เหลือจากการส่งเต็มม้วน ฝากสะสมไว้ที่ช่างตัดนอก
+        </p>
+      </div>
+
+      <!-- Card 4: Cut-Piece Return Verification -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">✂️ ตรวจรับผ้าตัดส่งกลับ (ชุด)</span>
+          <span id="kpi-open-batches-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0 ใบงานค้าง</span>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-returned-sets" class="text-2xl font-bold text-emerald-600">0</span>
+          <span class="text-sm text-slate-400">/ <span id="kpi-planned-sets">0</span> ชุด</span>
+          <span class="text-xs font-semibold text-rose-600">(ค้าง <span id="kpi-pending-sets">0</span> ชุด)</span>
+        </div>
+        <p class="mt-1 text-[11px] text-slate-500">
+          ติดตามช่างนอกส่งผ้าที่ตัดเป็นรุ่นๆ กลับมาเข้าโรงงาน
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs no-print">
+      <button data-tab="tab-weekly-plan" class="tab-btn active flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
+        <span>📅 1. วางแผนรายสัปดาห์ & คำนวณม้วนส่งช่าง</span>
+      </button>
+      <button data-tab="tab-return-verify" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
+        <span>✂️ 2. ตรวจนับผ้าตัดส่งกลับตามรุ่น</span>
+        <span id="nav-badge-pending" class="px-2 py-0.5 text-[10px] rounded-full bg-rose-100 text-rose-700 font-bold">0</span>
+      </button>
+      <button data-tab="tab-fabric-stock" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
+        <span>📦 3. สต็อกผ้าคงเหลือ (ม้วน/หลา) & รับผ้าเข้าใหม่</span>
+      </button>
+      <button data-tab="tab-cutter-ledger" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
+        <span>🤝 4. บัญชีเศษผ้าค้างที่ช่าง & สูตร BOM ผ้า</span>
+      </button>
+    </nav>
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: WEEKLY PLAN & ROLL DISPATCH CALCULATOR                       -->
+    <!-- =================================================================== -->
+    <section id="tab-weekly-plan" class="tab-pane space-y-6">
+
+      <!-- Action Bar: Add / Import Plan -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              📅 ตารางวางแผนผลิตต่อวัน (รวบส่งผ้าให้ช่างนอกรายสัปดาห์)
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              เพิ่มรุ่นโซฟาที่วางแผนผลิตในแต่ละวัน หรือดึงแผนจาก BOM Planner / ไฟล์ Excel ระบบจะดึงสูตรผ้า (หลา) และแปลงเป็นม้วน (50 หลา/ม้วน) อัตโนมัติ
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-pull-bom-planner" class="px-3.5 py-2 rounded-xl bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-semibold transition flex items-center gap-1.5">
+              📥 ดึงแผนล่าสุดจาก BOM Planner
+            </button>
+            <label class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5">
+              📂 อัปโหลดไฟล์ออเดอร์ Excel
+              <input type="file" id="file-upload-order-excel" accept=".xlsx,.xls,.csv" class="hidden">
+            </label>
+            <button id="btn-clear-weekly-plan" class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition">
+              🗑️ ล้างแผนสัปดาห์นี้
+            </button>
+          </div>
+        </div>
+
+        <!-- Form to Add Daily SKU to Weekly Plan -->
+        <form id="form-add-plan-item" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">วันในสัปดาห์</label>
+            <select id="plan-input-day" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="จันทร์">วันจันทร์</option>
+              <option value="อังคาร">วันอังคาร</option>
+              <option value="พุธ">วันพุธ</option>
+              <option value="พฤหัสบดี">วันพฤหัสบดี</option>
+              <option value="ศุกร์">วันศุกร์</option>
+              <option value="เสาร์">วันเสาร์</option>
+              <option value="อาทิตย์">วันอาทิตย์</option>
+            </select>
+          </div>
+          <div class="sm:col-span-5">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">เลือกรุ่นสินค้า (Master SKU เฉพาะรุ่นที่ใช้ผ้า/หนัง)</label>
+            <input type="text" id="plan-input-sku" list="sku-fabric-datalist" placeholder="พิมพ์ค้นหารุ่น เช่น bs2-ดำ, st3-เทา, rc-น้ำตาล..." required
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <datalist id="sku-fabric-datalist"></datalist>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">จำนวนผลิต (ตัว/ชุด)</label>
+            <input type="number" id="plan-input-qty" min="1" value="10" required
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">หมายเหตุ</label>
+            <input type="text" id="plan-input-note" placeholder="เช่น ออเดอร์เร่งด่วน"
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="sm:col-span-1">
+            <button type="submit" class="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg shadow transition">
+              + เพิ่ม
+            </button>
+          </div>
+        </form>
+
+        <!-- Weekly Planned SKU Table -->
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 text-[11px] uppercase border-b border-slate-200">
+                <th class="py-2.5 px-3">วัน</th>
+                <th class="py-2.5 px-3">รุ่นสินค้า (Master SKU)</th>
+                <th class="py-2.5 px-3">รหัสผ้าที่ใช้</th>
+                <th class="py-2.5 px-3 text-right">ใช้ผ้า/ตัว (หลา)</th>
+                <th class="py-2.5 px-3 text-center">จำนวนสั่งตัด (ชุด)</th>
+                <th class="py-2.5 px-3 text-right">รวมใช้ผ้า (หลา)</th>
+                <th class="py-2.5 px-3 text-right">คิดเป็นม้วน (÷50)</th>
+                <th class="py-2.5 px-3">หมายเหตุ</th>
+                <th class="py-2.5 px-3 text-center">ลบ</th>
+              </tr>
+            </thead>
+            <tbody id="weekly-plan-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Roll Conversion & Dispatch Summary Card -->
+      <div class="bg-white rounded-2xl p-5 border-2 border-indigo-200 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-100 text-indigo-800 mb-1">
+              🧮 คำนวณแปลงหน่วย: 50 หลา = 1 ม้วน
+            </div>
+            <h3 class="text-base font-bold text-slate-900">
+              ตารางสรุปยอดส่งผ้าให้ช่างนอกตัด (หักเศษผ้าสะสมที่ช่าง & เทียบสต็อกม้วนในคลัง)
+            </h3>
+            <p class="text-xs text-slate-500">
+              ระบบคำนวณยอดหลาตาม BOM ➔ หักเศษผ้าที่ฝากไว้ที่ช่างนอก ➔ แปลงเป็นจำนวนม้วนเต็ม (50 หลา/ม้วน) ที่ต้องเบิกส่ง และคำนวณเศษผ้าใหม่ที่จะเหลือไว้ที่ช่าง
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-open-dispatch-modal" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2">
+              🚀 ยืนยันเปิดใบสั่งตัดรายสัปดาห์ & ตัดสต็อกส่งช่างนอก
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900 text-white text-[11px] uppercase">
+                <th class="py-3 px-3">รหัสผ้า / สี</th>
+                <th class="py-3 px-3 text-center">รวมชุดที่ตัด</th>
+                <th class="py-3 px-3 text-right">ใช้ตาม BOM<br><span class="text-[10px] text-slate-300 font-normal">(หลา / ม้วน)</span></th>
+                <th class="py-3 px-3 text-right bg-amber-950/60">เศษผ้าค้างที่ช่าง<br><span class="text-[10px] text-amber-300 font-normal">(นำมาหักลบ)</span></th>
+                <th class="py-3 px-3 text-right">ยอดผ้าต้องส่งเพิ่ม<br><span class="text-[10px] text-slate-300 font-normal">(หลา / ม้วนจริง)</span></th>
+                <th class="py-3 px-3 text-center bg-indigo-950">จำนวนม้วนที่ส่งจริง<br><span class="text-[10px] text-indigo-300 font-normal">(1 ม้วน = 50 หลา)</span></th>
+                <th class="py-3 px-3 text-right">สต็อกคลังปัจจุบัน<br><span class="text-[10px] text-slate-300 font-normal">(ม้วน / หลา)</span></th>
+                <th class="py-3 px-3 text-center">สถานะสต็อกคลัง</th>
+                <th class="py-3 px-3 text-right bg-emerald-950/60">เศษผ้าใหม่ฝากช่าง<br><span class="text-[10px] text-emerald-300 font-normal">(หลังตัดจบรอบนี้)</span></th>
+              </tr>
+            </thead>
+            <tbody id="roll-calc-tbody" class="divide-y divide-slate-200 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: CUT-PIECE RETURN VERIFICATION LOOP                           -->
+    <!-- =================================================================== -->
+    <section id="tab-return-verify" class="tab-pane hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              ✂️ ระบบตรวจนับผ้าที่สั่งตัดส่งกลับมาตามรุ่น (Outsource Cut-Piece Verification)
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              มอนิเตอร์ว่าแต่ละใบสั่งตัดรายสัปดาห์ที่ส่งม้วนผ้าให้ช่างนอก ช่างตัดกลับมาครบตามรุ่นและจำนวนชุดหรือยัง
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="filter-batch-status" class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+              <option value="ALL">แสดงทุกสถานะใบสั่งตัด</option>
+              <option value="PENDING">เฉพาะที่กำลังตัด / ค้างส่งกลับ</option>
+              <option value="COMPLETED">ตรวจรับครบ 100% แล้ว</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="cutting-batches-container" class="space-y-5"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: FABRIC STOCK & INBOUND MONITOR (SYNC STOCK MOVEMENT)         -->
+    <!-- =================================================================== -->
+    <section id="tab-fabric-stock" class="tab-pane hidden space-y-6">
+
+      <!-- Inbound New Fabric Rolls Form -->
+      <div class="bg-white rounded-2xl p-5 border border-emerald-200 shadow-xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              ➕ บันทึกรับผ้าสั่งซื้อเข้าคลังใหม่ (ซิงค์เข้า Stock Movement อัตโนมัติ)
+            </h2>
+            <p class="text-xs text-slate-500">
+              คีย์รับเข้าเป็น <strong>ม้วน</strong> หรือ <strong>หลา</strong> ระบบจะแปลงหน่วย (50 หลา = 1 ม้วน) และเพิ่มรายการ Inbound ในระบบ Stock Movement ทันที
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+            🔄 Auto-Sync: STOCK_APP_DATA_V4
+          </span>
+        </div>
+
+        <form id="form-inbound-fabric" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end bg-emerald-50/50 p-4 rounded-xl border border-emerald-200/80">
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">รหัสผ้าที่สั่งเข้ามาใหม่</label>
+            <select id="inbound-fabric-select" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500">
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">จำนวนรับเข้า (ม้วน)</label>
+            <input type="number" id="inbound-rolls-input" step="0.01" min="0.1" value="5" required
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-emerald-700 text-center focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">คิดเป็นจำนวนหลา (×50)</label>
+            <input type="number" id="inbound-yards-input" step="1" min="5" value="250"
+              class="w-full px-3 py-2 bg-slate-100 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 text-center">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">ซัพพลายเออร์ / ร้านผ้า</label>
+            <input type="text" id="inbound-supplier-input" value="MJ / โรงงานผ้า"
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">หมายเหตุ / เลขบิล</label>
+            <input type="text" id="inbound-note-input" placeholder="เช่น ล็อตสั่งซื้อประจำสัปดาห์"
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+          </div>
+          <div class="sm:col-span-1">
+            <button type="submit" class="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow transition">
+              รับเข้าคลัง
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Fabric Stock Table (Rolls & Yards) -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">
+              📦 ตารางสต็อกผ้าคงเหลือทั้งหมด (แสดงคู่ ม้วน ↔ หลา)
+            </h3>
+            <p class="text-xs text-slate-500">
+              ตรวจสอบสต็อกผ้าในคลังโรงงาน เศษผ้าที่ฝากไว้ที่ช่างนอก และจุดแจ้งเตือนสั่งซื้อใหม่
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" id="stock-search-input" placeholder="ค้นหารหัสผ้า เช่น PQ002C, MJ337, ดำ, เทา..."
+              class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs w-60 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="stock-series-filter" class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium">
+              <option value="ALL">ทุกตระกูลผ้า (29 รหัส)</option>
+              <option value="PQ002C">หนัง PVC (PQ002C)</option>
+              <option value="MJ337">ผ้าฮอลแลนด์ (MJ337)</option>
+              <option value="MJ350">ผ้าโพลี (MJ350)</option>
+              <option value="MJ356">ผ้าลูกฟูก (MJ356)</option>
+              <option value="736B">ผ้าลาย (736B)</option>
+              <option value="LOW">⚠️ เฉพาะผ้าใกล้หมด/หมดสต็อก</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                <th class="py-3 px-3">รหัสผ้า / สี</th>
+                <th class="py-3 px-3">ตระกูลผ้า</th>
+                <th class="py-3 px-3 text-right">ยกมา + รับเข้า<br><span class="text-[10px] font-normal text-slate-500">(ม้วน)</span></th>
+                <th class="py-3 px-3 text-right">เบิกส่งช่างแล้ว<br><span class="text-[10px] font-normal text-slate-500">(ม้วน)</span></th>
+                <th class="py-3 px-3 text-right bg-indigo-50/70 font-bold text-indigo-900">คงเหลือในคลัง<br><span class="text-[10px] font-normal text-indigo-600">(ม้วนเต็ม)</span></th>
+                <th class="py-3 px-3 text-right bg-indigo-50/70 font-bold text-indigo-900">แปลงเป็นหลา<br><span class="text-[10px] font-normal text-indigo-600">(× 50 หลา)</span></th>
+                <th class="py-3 px-3 text-right bg-amber-50/70 text-amber-900">เศษผ้าค้างที่ช่าง<br><span class="text-[10px] font-normal text-amber-700">(หลา / ม้วน)</span></th>
+                <th class="py-3 px-3 text-center">สถานะสต็อก</th>
+                <th class="py-3 px-3 text-center">จัดการด่วน</th>
+              </tr>
+            </thead>
+            <tbody id="fabric-stock-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Synced Stock Movement Transactions (Fabrics Only) -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
+        <h3 class="text-sm font-bold text-slate-900">
+          🕒 ประวัติเคลื่อนไหวสต็อกผ้าล่าสุด (ซิงค์กับ Stock Movement App)
+        </h3>
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl max-h-72">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[11px] uppercase border-b border-slate-200">
+                <th class="py-2.5 px-3">รหัสรายการ</th>
+                <th class="py-2.5 px-3">วันที่</th>
+                <th class="py-2.5 px-3">ประเภท</th>
+                <th class="py-2.5 px-3">รหัสผ้า</th>
+                <th class="py-2.5 px-3 text-right">จำนวน (ม้วน)</th>
+                <th class="py-2.5 px-3 text-right">เทียบเป็นหลา (×50)</th>
+                <th class="py-2.5 px-3">รายละเอียด (ซิงค์ใน Stock Movement)</th>
+              </tr>
+            </thead>
+            <tbody id="fabric-tx-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 4: CUTTER BALANCE LEDGER & MASTER FABRIC BOM                    -->
+    <!-- =================================================================== -->
+    <section id="tab-cutter-ledger" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 cols: Cutter Balance Table -->
+        <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              🤝 บัญชีคุมยอดเศษผ้าสะสมที่ฝากไว้ที่ช่างนอก (Cutter Roll Remnant Balance)
+            </h2>
+            <p class="text-xs text-slate-500">
+              เนื่องจากเราส่งผ้าเป็นม้วนเต็ม (50 หลา) ส่วนที่เหลือจากการตัดตาม BOM จะถูกบันทึกสะสมไว้ที่ช่างเพื่อหักลบในสัปดาห์ถัดไป
+            </p>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                  <th class="py-2.5 px-3">รหัสผ้า</th>
+                  <th class="py-2.5 px-3 text-right">ส่งช่างสะสม<br><span class="text-[10px] font-normal">(ม้วน / หลา)</span></th>
+                  <th class="py-2.5 px-3 text-right">ตัดใช้สะสม<br><span class="text-[10px] font-normal">(หลา)</span></th>
+                  <th class="py-2.5 px-3 text-right bg-amber-50 font-bold text-amber-900">คงเหลือที่ช่าง<br><span class="text-[10px] font-normal">(หลา / ม้วน)</span></th>
+                  <th class="py-2.5 px-3 text-center">ปรับยอด/คืนคลัง</th>
+                </tr>
+              </thead>
+              <tbody id="cutter-balance-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right 5 cols: Cutter Ledger Log -->
+        <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">
+              📜 ประวัติการส่งม้วนผ้า & หักลบเศษผ้าที่ช่างนอก
+            </h3>
+            <p class="text-xs text-slate-500">
+              บันทึกทุกครั้งที่มีการส่งม้วนผ้าตัดสต็อก หรือปรับปรุงยอดตรวจนับที่ช่าง
+            </p>
+          </div>
+          <div id="cutter-ledger-list" class="space-y-2.5 max-h-[420px] overflow-y-auto custom-scrollbar pr-1"></div>
+        </div>
+      </div>
+
+      <!-- Master BOM Fabric Formula Reference -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">
+              📐 ตารางสูตรการใช้ผ้าตาม Master BOM (หลา/ตัว & จำนวนตัวที่ตัดได้ต่อ 1 ม้วน 50 หลา)
+            </h3>
+            <p class="text-xs text-slate-500">
+              แสดงเฉพาะรุ่นสินค้าที่มีการใช้ผ้า/หนังในสูตร Master BOM
+            </p>
+          </div>
+          <input type="text" id="bom-ref-search" placeholder="ค้นหารุ่นโซฟา หรือรหัสผ้า..."
+            class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs w-64">
+        </div>
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl max-h-80">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200 sticky top-0">
+                <th class="py-2.5 px-3">รุ่นสินค้า (Master SKU)</th>
+                <th class="py-2.5 px-3">รหัสผ้าที่ใช้</th>
+                <th class="py-2.5 px-3 text-right">ปริมาณผ้าที่ใช้ / 1 ตัว (หลา)</th>
+                <th class="py-2.5 px-3 text-right">คิดเป็นสัดส่วนม้วน / ตัว</th>
+                <th class="py-2.5 px-3 text-right bg-indigo-50 text-indigo-900">ผ้า 1 ม้วน (50 หลา) ตัดรุ่นนี้ได้</th>
+              </tr>
+            </thead>
+            <tbody id="bom-fabric-ref-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =================================================================== -->
+  <!-- MODAL 1: CONFIRM WEEKLY ROLL DISPATCH TO CUTTER                     -->
+  <!-- =================================================================== -->
+  <div id="modal-dispatch-batch" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">🚀 ยืนยันเปิดใบสั่งตัดรายสัปดาห์ & ตัดสต็อกม้วนผ้า</h3>
+        <button id="btn-close-dispatch-modal" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">ชื่อรอบใบสั่งตัดรายสัปดาห์</label>
+          <input type="text" id="modal-dispatch-week-label" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-medium">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">ชื่อทีมช่างตัดนอกผู้รับม้วนผ้า</label>
+          <input type="text" id="modal-dispatch-cutter-name" value="ทีมช่างตัดนอก - ช่างเอก" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-medium">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">หมายเหตุใบส่งผ้า</label>
+          <input type="text" id="modal-dispatch-note" placeholder="เช่น ส่งม้วนผ้าวันจันทร์ รอรับผ้าตัดกลับวันศุกร์" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+        </div>
+        <div id="modal-dispatch-summary-box" class="bg-indigo-50 p-3.5 rounded-xl border border-indigo-200 text-indigo-950 space-y-1">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button id="btn-cancel-dispatch-modal" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">ยกเลิก</button>
+        <button id="btn-confirm-dispatch-submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white shadow">
+          ✅ ยืนยันส่งผ้า & ซิงค์ตัดสต็อก Stock Movement
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL 2: RECORD CUT-PIECE RETURN BY SKU                             -->
+  <!-- =================================================================== -->
+  <div id="modal-return-piece" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">✂️ บันทึกรับชุดผ้าที่ช่างนอกตัดส่งกลับ</h3>
+        <button id="btn-close-return-modal" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input type="hidden" id="return-modal-batch-id">
+        <input type="hidden" id="return-modal-item-id">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+          <div class="text-slate-500">รุ่นสินค้า (Master SKU):</div>
+          <div id="return-modal-sku-name" class="font-bold text-slate-900 text-sm"></div>
+          <div id="return-modal-progress-text" class="text-indigo-600 font-semibold"></div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">จำนวนชุดผ้าที่ตรวจรับเข้าในรอบนี้ (ชุด)</label>
+          <input type="number" id="return-modal-qty" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-base text-center text-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">หมายเหตุการตรวจรับ</label>
+          <input type="text" id="return-modal-note" placeholder="เช่น นับครบชิ้นส่วนพนักพิง+เบาะ+แขน" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button id="btn-cancel-return-modal" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">ยกเลิก</button>
+        <button id="btn-confirm-return-submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white shadow">
+          ✅ บันทึกรับผ้าตัดเข้าโรงงาน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL 3: ADJUST CUTTER REMNANT BALANCE                              -->
+  <!-- =================================================================== -->
+  <div id="modal-adjust-cutter" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">⚖️ ปรับปรุงยอดเศษผ้าค้างที่ช่างนอก / รับคืนคลัง</h3>
+        <button id="btn-close-adjust-cutter" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input type="hidden" id="adjust-cutter-fabric-name">
+        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+          <div class="text-amber-700">รหัสผ้า: <strong id="adjust-cutter-title" class="text-sm text-amber-950"></strong></div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">ยอดเศษผ้าที่เหลืออยู่กับช่างจริง (หน่วย: หลา)</label>
+          <input type="number" id="adjust-cutter-yards-input" step="0.5" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-center text-sm">
+          <p class="text-[11px] text-slate-400 mt-1">50 หลา = 1 ม้วน (ระบุเป็นจำนวนหลาที่นับได้จริงที่ช่างนอก)</p>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">กรณีช่างส่งคืนเป็นม้วนกลับเข้าคลังโรงงาน (จำนวนม้วน)</label>
+          <input type="number" id="adjust-cutter-return-rolls" step="0.5" min="0" value="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-semibold text-center">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">สาเหตุการปรับยอด</label>
+          <input type="text" id="adjust-cutter-note" placeholder="เช่น ตรวจนับสต็อกปลายสัปดาห์ที่บ้านช่าง" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button id="btn-cancel-adjust-cutter" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">ยกเลิก</button>
+        <button id="btn-confirm-adjust-cutter" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-xs font-bold text-white shadow">
+          บันทึกยอดที่ช่างนอก
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2.5 text-xs font-medium no-print">
+    <span id="toast-icon">✅</span>
+    <span id="toast-msg">บันทึกสำเร็จ</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="xlsx.full.min.js"></script>
+  <script src="supabase.min.js"></script>
+  <script src="master-bom-data.js"></script>
+  <script src="sku-mapper.js"></script>
+  <script src="seed.js"></script>
+  <script src="fabric-store.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
