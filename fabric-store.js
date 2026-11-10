@@ -90,23 +90,47 @@
 
   function getFabricSeriesInfo(fabricName) {
     const name = String(fabricName || '');
-    if (name.includes('PQ002C')) {
+    if (name.includes('PQ002C') || name.includes('PD130') || name.includes('PD9006')) {
       return { series: 'PQ002C', label: 'หนัง PVC (PQ002C)', badgeClass: 'bg-slate-800 text-white' };
     }
-    if (name.includes('MJ337') || name.includes('337')) {
-      return { series: 'MJ337', label: 'ผ้าฮอลแลนด์ (MJ337)', badgeClass: 'bg-indigo-100 text-indigo-800 border border-indigo-200' };
+    if (name.includes('MJ337') || name.includes('HL337') || name.includes('337')) {
+      return { series: 'MJ337', label: 'ผ้าฮอลแลนด์ (337)', badgeClass: 'bg-indigo-100 text-indigo-800 border border-indigo-200' };
     }
     if (name.includes('MJ350') || name.includes('350')) {
       return { series: 'MJ350', label: 'ผ้าโพลี (MJ350)', badgeClass: 'bg-sky-100 text-sky-800 border border-sky-200' };
     }
-    if (name.includes('MJ356') || name.includes('356')) {
-      return { series: 'MJ356', label: 'ผ้าลูกฟูก (MJ356)', badgeClass: 'bg-amber-100 text-amber-800 border border-amber-200' };
+    if (name.includes('MJ356') || name.includes('MJ 356') || name.includes('CSF356') || name.includes('356')) {
+      return { series: 'MJ356', label: 'ผ้าลูกฟูก (356)', badgeClass: 'bg-amber-100 text-amber-800 border border-amber-200' };
     }
-    if (name.includes('736b')) {
-      return { series: '736B', label: 'ผ้าลาย (736B)', badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-200' };
+    if (name.includes('736b') || name.includes('736B')) {
+      return { series: '736B', label: 'ผ้านาโน (736B)', badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-200' };
     }
     return { series: 'OTHER', label: 'ผ้า/หนังอื่นๆ', badgeClass: 'bg-purple-100 text-purple-800 border border-purple-200' };
   }
+
+  // Maps BOM/Routine fabric names to Admin's real Stock Movement product names (stored in 'หลา')
+  const BOM_TO_STOCK_ALIASES = {
+    'ขาว-pq002c-1': ['PQ002C-01 (ขาว)'],
+    'ครีม-pq002c-6': ['PQ002C-06 (ครีม)'],
+    'น้ำตาล-pq002c-12': ['PQ002C-12 (น้ำตาล)'],
+    'ดำ-pq002c-17': ['PD130 (ดำ) TD', 'PQ002C-17 (ดำ)'],
+    'ชา-pq002c-19': ['PQ002C-19 (ชา)'],
+    'เทา-pq002c-46': ['PQ002C-46 (เทา)', 'PQ002C-28 (เทาอ่อน) แทน 46'],
+    'มอคค่า-pq002c-48': ['PD9006 (มอคค่า) TD', 'PQ002C-48 (มอคค่า)'],
+    'สีครีม-mj356-1a': ['MJ 356-1A (ลูกฟูกครีม)', 'CSF356-1A (ลูกฟูกครีม)'],
+    'สีเขียว-mj356-2a': ['CSF356-3A (ลูกฟูกเขียว)', 'MJ 356-2A (ลูกฟูกเขียว)'],
+    'สีเทา-mj356-3a': ['MJ 356-3A (ลูกฟูกเทา)', 'CSF356-2A (ลูกฟูกเทา)'],
+    'สีน้ำตาล-mj356-4a': ['356-04B ร่อนใหญ่ (น้ำตาล)', 'MJ 356-4A (ลูกฟูกน้ำตาล)', 'CSF356-4A (ลูกฟูกน้ำตาล)'],
+    'สีน้ำตาล-mj337-7': ['MJ337-07 (น้ำตาลทอง)', 'HL337-07 (น้ำตาลทอง)', 'MJ337-08 (น้ำตาล)'],
+    'สีเขียว-mj337-14': ['MJ337-14 (เขียว)', 'HL337-14 (เขียว)'],
+    'สีโรสโกลด์-mj337-22': ['MJ337-22 (โรสโกลด์)', 'HL337-22 (โรสโกลด์)'],
+    'สีแดงมะเหมี่ยว-mj337-23': ['MJ337-23 (แดงไวน์)', 'HL337-23 (แดงไวน์)'],
+    'สีเทา-mj337-29': ['MJ337-29 (เทาควัน)', 'HL337-29 (เทาควัน)', 'MJ337-26 (เทาอ่อน)', 'MJ337-30 (เทาอมเขียว)'],
+    'สีน้ำเงิน-mj337-31': ['MJ337-31 (น้ำเงิน)', 'HL337-31 (น้ำเงิน)'],
+    'สีน้ำตาลทอง-736b-01': ['MJ736B-1 (นาโนน้ำตาลทอง)', 'PKD736B-1 (นาโนน้ำตาลทอง)'],
+    'สีเทาเข้ม-736b-02': ['MJ736B-2 (นาโนเทา)', 'PKD736B-2 (นาโนเทา)'],
+    'สีฟ้าเทา-736b-04': ['MJ736B-4 (นาโนฟ้า)', 'PKD736B-4 (นาโนฟ้า)']
+  };
 
   class FabricCutterStore {
     constructor() {
@@ -521,41 +545,46 @@
       }
     }
 
+    // Never inject FAB-* ('ม้วน') items into Stock Movement!
+    // Stock Movement manages all fabric items strictly in 'หลา' (PROD-071..PROD-109, PROD-119).
+    // All Roll (ม้วน = 50 หลา) conversions happen ONLY inside fabric-cutter-web.
     ensureBomFabricsInStockMovement() {
-      const bomFabrics = this.getBomFabricMaterials();
       let modified = false;
-
       if (!this.stockData.products) this.stockData.products = [];
 
-      bomFabrics.forEach((mat, idx) => {
-        const existing = this.stockData.products.find(
-          p => p.name.trim().toLowerCase() === mat.name.trim().toLowerCase()
-        );
-        const yardPrice = DEFAULT_YARD_PRICES[mat.name] || 75;
-        const rollPrice = yardPrice * YARDS_PER_ROLL;
-        const defaultRolls = DEFAULT_INITIAL_ROLLS[mat.name] !== undefined ? DEFAULT_INITIAL_ROLLS[mat.name] : 5;
+      const beforeLen = this.stockData.products.length;
+      this.stockData.products = this.stockData.products.filter(p => {
+        const idStr = String(p.id || '');
+        const noteStr = String(p.note || '');
+        if (idStr.startsWith('FAB-')) return false;
+        if (noteStr.includes('ซิงค์จากสูตร BOM') || noteStr.includes('ซิงค์อัตโนมัติจากสูตร Master BOM')) return false;
+        return true;
+      });
+      if (this.stockData.products.length !== beforeLen) {
+        modified = true;
+      }
 
-        if (!existing) {
-          const newId = `FAB-${String(idx + 1).padStart(3, '0')}`;
-          this.stockData.products.push({
-            id: newId,
-            name: mat.name,
-            category: 'ผ้าม้วน',
-            initialStock: defaultRolls,
-            unit: 'ม้วน',
-            conversionNote: `1 ม้วน = ${YARDS_PER_ROLL} หลา (฿${yardPrice}/หลา)`,
-            unitPrice: rollPrice,
-            minAlert: 3, // Alert when <= 3 rolls (150 yards)
-            note: `ซิงค์อัตโนมัติจากสูตร Master BOM (1 ม้วน = ${YARDS_PER_ROLL} หลา)`
-          });
-          modified = true;
-        } else {
-          if (existing.category !== 'ผ้าม้วน') {
-            existing.category = 'ผ้าม้วน';
+      // If products list has no fabric items yet (e.g. old 64-item seed), merge fabric items from INITIAL_INVENTORY_DATA
+      const hasRealFabrics = this.stockData.products.some(p => p.category === 'ผ้าม้วน' || String(p.name || '').includes('PQ002C'));
+      if (!hasRealFabrics && window.INITIAL_INVENTORY_DATA && Array.isArray(window.INITIAL_INVENTORY_DATA.products)) {
+        const existingIds = new Set(this.stockData.products.map(p => p.id));
+        window.INITIAL_INVENTORY_DATA.products.forEach(sp => {
+          if (!existingIds.has(sp.id)) {
+            this.stockData.products.push(JSON.parse(JSON.stringify(sp)));
             modified = true;
           }
-          if (!existing.conversionNote) {
-            existing.conversionNote = `1 ม้วน = ${YARDS_PER_ROLL} หลา`;
+        });
+      }
+
+      this.stockData.products.forEach(p => {
+        const name = String(p.name || '');
+        if (name.includes('PQ002C') || name.includes('MJ337') || name.includes('MJ 356') || name.includes('CSF356') || name.includes('HL337') || name.includes('PKD736B') || name.includes('MJ736B') || name.includes('PD130') || name.includes('PD9006') || name.includes('356-04B')) {
+          if (p.category !== 'ผ้าม้วน') {
+            p.category = 'ผ้าม้วน';
+            modified = true;
+          }
+          if (p.unit !== 'หลา') {
+            p.unit = 'หลา';
             modified = true;
           }
         }
@@ -566,6 +595,36 @@
       } else {
         this.syncToBomPlannerYards();
       }
+    }
+
+    findMatchingStockProduct(fabricName) {
+      if (!this.stockData || !Array.isArray(this.stockData.products)) return null;
+      const clean = String(fabricName || '').trim().toLowerCase();
+      // 1. Direct match by id or name
+      let prod = this.stockData.products.find(
+        p => String(p.id || '').toLowerCase() === clean || String(p.name || '').trim().toLowerCase() === clean
+      );
+      if (prod) return prod;
+
+      // 2. Match via BOM_TO_STOCK_ALIASES
+      const aliases = BOM_TO_STOCK_ALIASES[clean];
+      if (aliases && aliases.length > 0) {
+        for (const aliasName of aliases) {
+          const found = this.stockData.products.find(
+            p => String(p.name || '').trim().toLowerCase() === aliasName.trim().toLowerCase()
+          );
+          if (found) return found;
+        }
+      }
+
+      // 3. Substring code match (e.g. PQ002C-06, 337-29, 736B-01)
+      const codeMatch = clean.match(/(pq002c-\d+|337-\d+|356-\d+[a-z]?|736b-0?\d+)/i);
+      if (codeMatch) {
+        const token = codeMatch[1].toLowerCase().replace('736b-0', '736b-');
+        prod = this.stockData.products.find(p => String(p.name || '').toLowerCase().includes(token));
+        if (prod) return prod;
+      }
+      return null;
     }
 
     saveStockMovementData(broadcast = true) {
@@ -784,7 +843,7 @@
     }
 
     // =========================================================
-    // COMPUTED STOCK (Syncs with STOCK_APP_DATA_V4)
+    // COMPUTED STOCK (Reads 'หลา' from STOCK_APP_DATA_V4 and converts ÷50 to 'ม้วน' ONLY inside fabric-cutter-web)
     // =========================================================
     getComputedFabricStocks() {
       this.loadStockMovementData(false);
@@ -823,32 +882,59 @@
 
       const bomFabricSet = new Set(this.getBomFabricMaterials().map(m => m.name.trim().toLowerCase()));
 
-      // Filter products that are in 'ผ้าม้วน' or in BOM fabrics
+      // Filter products that are in 'ผ้าม้วน' or in BOM fabrics (excluding any legacy FAB- items)
       const fabricProducts = products.filter(p =>
-        p.category === 'ผ้าม้วน' || bomFabricSet.has((p.name || '').trim().toLowerCase())
+        !String(p.id || '').startsWith('FAB-') &&
+        (p.category === 'ผ้าม้วน' || bomFabricSet.has((p.name || '').trim().toLowerCase()))
       );
 
       return fabricProducts.map(p => {
         const pid = p.id;
         const pname = p.name;
-        const initRolls = Number(p.initialStock || 0);
-        const inRolls = inMap[pid] !== undefined ? inMap[pid] : (inMap[pname] || 0);
-        const outRolls = outMap[pid] !== undefined ? outMap[pid] : (outMap[pname] || 0);
-        const adjRolls = adjMap[pid] !== undefined ? adjMap[pid] : (adjMap[pname] || 0);
+        const isYardUnit = (p.unit || 'หลา') === 'หลา';
 
-        const warehouseRolls = Math.round((initRolls + inRolls - outRolls + adjRolls) * 100) / 100;
-        const warehouseYards = Math.round(warehouseRolls * YARDS_PER_ROLL * 100) / 100;
+        const rawInit = Number(p.initialStock || 0);
+        const rawIn = inMap[pid] !== undefined ? inMap[pid] : (inMap[pname] || 0);
+        const rawOut = outMap[pid] !== undefined ? outMap[pid] : (outMap[pname] || 0);
+        const rawAdj = adjMap[pid] !== undefined ? adjMap[pid] : (adjMap[pname] || 0);
+        const rawNet = rawInit + rawIn - rawOut + rawAdj;
 
-        const cutterInfo = this.state.cutterBalance[pname] || { balanceYards: 0, totalSentRolls: 0, totalSentYards: 0, totalUsedYards: 0 };
+        // Convert 'หลา' from Stock Movement -> 'ม้วน' (÷ 50) inside fabric-cutter-web
+        const initRolls = isYardUnit ? Math.round((rawInit / YARDS_PER_ROLL) * 100) / 100 : rawInit;
+        const inRolls = isYardUnit ? Math.round((rawIn / YARDS_PER_ROLL) * 100) / 100 : rawIn;
+        const outRolls = isYardUnit ? Math.round((rawOut / YARDS_PER_ROLL) * 100) / 100 : rawOut;
+        const adjRolls = isYardUnit ? Math.round((rawAdj / YARDS_PER_ROLL) * 100) / 100 : rawAdj;
+
+        const warehouseYards = isYardUnit ? Math.round(rawNet * 100) / 100 : Math.round(rawNet * YARDS_PER_ROLL * 100) / 100;
+        const warehouseRolls = Math.round((warehouseYards / YARDS_PER_ROLL) * 100) / 100;
+
+        // Look up cutter balance by exact product name or mapped BOM name
+        let cutterInfo = this.state.cutterBalance[pname];
+        if (!cutterInfo) {
+          for (const [bomKey, aliases] of Object.entries(BOM_TO_STOCK_ALIASES)) {
+            if (aliases.some(a => a.toLowerCase() === pname.trim().toLowerCase())) {
+              const matchedKey = Object.keys(this.state.cutterBalance).find(k => k.toLowerCase() === bomKey);
+              if (matchedKey) {
+                cutterInfo = this.state.cutterBalance[matchedKey];
+                break;
+              }
+            }
+          }
+        }
+        cutterInfo = cutterInfo || { balanceYards: 0, totalSentRolls: 0, totalSentYards: 0, totalUsedYards: 0 };
+
         const cutterYards = Math.round((Number(cutterInfo.balanceYards) || 0) * 100) / 100;
         const cutterRolls = Math.round((cutterYards / YARDS_PER_ROLL) * 100) / 100;
 
         const totalCompanyYards = Math.round((warehouseYards + cutterYards) * 100) / 100;
         const totalCompanyRolls = Math.round((totalCompanyYards / YARDS_PER_ROLL) * 100) / 100;
 
-        const minAlertRolls = Number(p.minAlert || 3);
-        const unitPriceRoll = Number(p.unitPrice || (DEFAULT_YARD_PRICES[pname] || 75) * YARDS_PER_ROLL);
-        const unitPriceYard = Math.round((unitPriceRoll / YARDS_PER_ROLL) * 100) / 100;
+        const rawMinAlert = Number(p.minAlert || 100);
+        const minAlertRolls = isYardUnit ? Math.max(1, Math.round((rawMinAlert / YARDS_PER_ROLL) * 10) / 10) : rawMinAlert;
+
+        const rawPrice = Number(p.unitPrice || 50);
+        const unitPriceYard = isYardUnit ? rawPrice : Math.round((rawPrice / YARDS_PER_ROLL) * 100) / 100;
+        const unitPriceRoll = isYardUnit ? Math.round(rawPrice * YARDS_PER_ROLL * 100) / 100 : rawPrice;
 
         const seriesInfo = getFabricSeriesInfo(pname);
 
@@ -871,7 +957,8 @@
           series: seriesInfo.series,
           seriesLabel: seriesInfo.label,
           seriesBadge: seriesInfo.badgeClass,
-          unit: p.unit || 'ม้วน',
+          unit: 'ม้วน (แปลงจากหลา ÷50)',
+          stockUnitInMovement: p.unit || 'หลา',
           initRolls,
           inRolls,
           outRolls,
@@ -885,7 +972,7 @@
           minAlertRolls,
           unitPriceRoll,
           unitPriceYard,
-          warehouseValue: Math.round(warehouseRolls * unitPriceRoll * 100) / 100,
+          warehouseValue: Math.round(warehouseYards * unitPriceYard * 100) / 100,
           status,
           statusLabel,
           statusBadge
@@ -893,44 +980,57 @@
       });
     }
 
-    // Get recent stock transactions for fabrics only
+    // Get recent stock transactions for fabrics only (converting Stock Movement 'หลา' -> 'ม้วน' for display)
     getFabricTransactions() {
       this.loadStockMovementData(false);
-      const fabricNames = new Set(this.getComputedFabricStocks().map(f => f.name));
-      const fabricIds = new Set(this.getComputedFabricStocks().map(f => f.id));
+      const computed = this.getComputedFabricStocks();
+      const fabricNames = new Set(computed.map(f => f.name));
+      const fabricIds = new Set(computed.map(f => f.id));
 
       const txs = [];
       (this.stockData.inbound || []).forEach(item => {
         if (fabricIds.has(item.productId) || fabricNames.has(item.productName)) {
+          const rawQty = Number(item.quantity || 0);
+          const isRollTx = item.unit === 'ม้วน';
+          const yards = isRollTx ? Math.round(rawQty * YARDS_PER_ROLL * 100) / 100 : Math.round(rawQty * 100) / 100;
+          const rolls = isRollTx ? rawQty : Math.round((rawQty / YARDS_PER_ROLL) * 100) / 100;
           txs.push({
             ...item,
             txType: 'IN',
-            rolls: Number(item.quantity || 0),
-            yards: Math.round(Number(item.quantity || 0) * YARDS_PER_ROLL * 100) / 100,
-            detail: `รับผ้าเข้าใหม่ (Supplier: ${item.supplier || '-'}) ${item.note ? '• ' + item.note : ''}`
+            rolls,
+            yards,
+            detail: `รับผ้าเข้าคลัง (Supplier: ${item.supplier || '-'}) ${item.note ? '• ' + item.note : ''}`
           });
         }
       });
 
       (this.stockData.outbound || []).forEach(item => {
         if (fabricIds.has(item.productId) || fabricNames.has(item.productName)) {
+          const rawQty = Number(item.quantity || 0);
+          const isRollTx = item.unit === 'ม้วน';
+          const yards = isRollTx ? Math.round(rawQty * YARDS_PER_ROLL * 100) / 100 : Math.round(rawQty * 100) / 100;
+          const rolls = isRollTx ? rawQty : Math.round((rawQty / YARDS_PER_ROLL) * 100) / 100;
           txs.push({
             ...item,
             txType: 'OUT',
-            rolls: Number(item.quantity || 0),
-            yards: Math.round(Number(item.quantity || 0) * YARDS_PER_ROLL * 100) / 100,
-            detail: `เบิกส่งช่างตัด • ${item.dailyUsage || '-'} `
+            rolls,
+            yards,
+            detail: `เบิกจ่ายผ้า • ${item.dailyUsage || '-'}`
           });
         }
       });
 
       (this.stockData.adjustments || []).forEach(item => {
         if (fabricIds.has(item.productId) || fabricNames.has(item.productName)) {
+          const rawQty = Number(item.quantity || 0);
+          const isRollTx = item.unit === 'ม้วน';
+          const yards = isRollTx ? Math.round(rawQty * YARDS_PER_ROLL * 100) / 100 : Math.round(rawQty * 100) / 100;
+          const rolls = isRollTx ? rawQty : Math.round((rawQty / YARDS_PER_ROLL) * 100) / 100;
           txs.push({
             ...item,
             txType: 'ADJUST',
-            rolls: Number(item.quantity || 0),
-            yards: Math.round(Number(item.quantity || 0) * YARDS_PER_ROLL * 100) / 100,
+            rolls,
+            yards,
             detail: `ปรับปรุงสต็อก • ${item.note || '-'}`
           });
         }
@@ -940,35 +1040,43 @@
     }
 
     // =========================================================
-    // STOCK MOVEMENT SYNC ACTIONS (INBOUND / OUTBOUND / ADJUST)
+    // STOCK MOVEMENT SYNC ACTIONS (Records in 'หลา' into STOCK_APP_DATA_V4!)
     // =========================================================
 
-    // Receive new fabric rolls into warehouse -> syncs directly to STOCK_APP_DATA_V4
+    // Receive new fabric rolls into warehouse -> converts rolls * 50 into 'หลา' for STOCK_APP_DATA_V4
     receiveFabricRolls({ fabricName, rolls, yardsInput, unitPriceRoll, supplier, date, note }) {
       this.loadStockMovementData(false);
-      const prod = this.stockData.products.find(p => p.name === fabricName || p.id === fabricName);
-      if (!prod) throw new Error(`ไม่พบรหัสผ้า ${fabricName} ในระบบ`);
+      const prod = this.findMatchingStockProduct(fabricName);
+      if (!prod) throw new Error(`ไม่พบรหัสผ้า ${fabricName} ในระบบ Stock Movement`);
 
-      const rollQty = rolls !== undefined && rolls !== null
+      const rollQty = rolls !== undefined && rolls !== null && rolls !== ''
         ? Number(rolls)
         : Math.round((Number(yardsInput || 0) / YARDS_PER_ROLL) * 100) / 100;
 
       if (rollQty <= 0) throw new Error('จำนวนม้วนที่รับเข้าต้องมากกว่า 0');
 
-      const price = Number(unitPriceRoll !== undefined && unitPriceRoll !== '' ? unitPriceRoll : prod.unitPrice || 3500);
+      const yardsTotal = yardsInput !== undefined && yardsInput !== null && yardsInput !== '' && Number(yardsInput) > 0
+        ? Math.round(Number(yardsInput) * 100) / 100
+        : Math.round(rollQty * YARDS_PER_ROLL * 100) / 100;
+
+      // In Stock Movement, unitPrice is per 'หลา' (e.g. 32 - 54 THB/yard)
+      const pricePerYard = unitPriceRoll !== undefined && unitPriceRoll !== ''
+        ? (Number(unitPriceRoll) > 200 ? Math.round((Number(unitPriceRoll) / YARDS_PER_ROLL) * 100) / 100 : Number(unitPriceRoll))
+        : Number(prod.unitPrice || 50);
+
       const newId = 'IN-' + String((this.stockData.inbound || []).length + 1).padStart(4, '0');
-      const yardsTotal = Math.round(rollQty * YARDS_PER_ROLL * 100) / 100;
 
       const entry = {
         id: newId,
         productId: prod.id,
         productName: prod.name,
-        quantity: rollQty,
-        unitPrice: price,
-        totalValue: rollQty * price,
+        quantity: yardsTotal,
+        unit: 'หลา',
+        unitPrice: pricePerYard,
+        totalValue: Math.round(yardsTotal * pricePerYard * 100) / 100,
         date: date || new Date().toISOString().split('T')[0],
         supplier: supplier || 'โรงงานผ้า/ซัพพลายเออร์',
-        note: `${rollQty} ม้วน (${yardsTotal} หลา)${note ? ' - ' + note : ''}`,
+        note: `${rollQty} ม้วน${note ? ' ' + note : ''}`,
         type: 'IN'
       };
 
@@ -979,11 +1087,11 @@
       return entry;
     }
 
-    // Dispatch rolls to external cutter -> deducts from STOCK_APP_DATA_V4 outbound
+    // Dispatch rolls to external cutter -> deducts in 'หลา' from STOCK_APP_DATA_V4 outbound
     dispatchRollsToOutsource({ fabricName, rollsToSend, batchId, cutterName, date }) {
       this.loadStockMovementData(false);
-      const prod = this.stockData.products.find(p => p.name === fabricName || p.id === fabricName);
-      if (!prod) throw new Error(`ไม่พบรหัสผ้า ${fabricName}`);
+      const prod = this.findMatchingStockProduct(fabricName);
+      if (!prod) return null;
 
       const rollQty = Number(rollsToSend || 0);
       if (rollQty <= 0) return null;
@@ -995,10 +1103,10 @@
         id: newId,
         productId: prod.id,
         productName: prod.name,
-        quantity: rollQty,
-        unit: 'ม้วน',
+        quantity: yardsSent,
+        unit: 'หลา',
         date: date || new Date().toISOString().split('T')[0],
-        dailyUsage: `ส่งช่างนอก (${cutterName || 'ช่างตัดนอก'}) ใบสั่งตัด ${batchId} [${rollQty} ม้วน = ${yardsSent} หลา]`,
+        dailyUsage: `${rollQty} ม้วน ส่งช่างตัด (${cutterName || 'ช่างตัดนอก'} • ${batchId})`,
         type: 'OUT'
       };
 
@@ -1008,10 +1116,10 @@
       return entry;
     }
 
-    // Adjust warehouse stock in rolls -> syncs to STOCK_APP_DATA_V4 adjustments
+    // Adjust warehouse stock in rolls -> syncs in 'หลา' to STOCK_APP_DATA_V4 adjustments
     adjustWarehouseRolls({ fabricName, diffRolls, date, note }) {
       this.loadStockMovementData(false);
-      const prod = this.stockData.products.find(p => p.name === fabricName || p.id === fabricName);
+      const prod = this.findMatchingStockProduct(fabricName);
       if (!prod) throw new Error(`ไม่พบรหัสผ้า ${fabricName}`);
 
       const qty = Number(diffRolls || 0);
@@ -1024,7 +1132,8 @@
         id: newId,
         productId: prod.id,
         productName: prod.name,
-        quantity: qty,
+        quantity: yardsDiff,
+        unit: 'หลา',
         date: date || new Date().toISOString().split('T')[0],
         note: `ปรับสต็อกผ้า ${qty > 0 ? '+' : ''}${qty} ม้วน (${yardsDiff > 0 ? '+' : ''}${yardsDiff} หลา) ${note ? '• ' + note : ''}`,
         type: 'ADJUST'
@@ -1209,14 +1318,34 @@
 
       byFabric.forEach(group => {
         const fname = group.fabricName;
-        const stockInfo = stockMap.get(fname) || {
-          warehouseRolls: 0,
-          warehouseYards: 0,
-          cutterYards: 0,
-          cutterRolls: 0,
-          unitPriceRoll: 3500,
-          unitPriceYard: 70
-        };
+        let stockInfo = stockMap.get(fname);
+        if (!stockInfo) {
+          // Sum across aliased Stock Movement products (e.g. 'ดำ-PQ002C-17' -> 'PD130 (ดำ) TD' + 'PQ002C-17 (ดำ)')
+          const aliases = BOM_TO_STOCK_ALIASES[String(fname || '').trim().toLowerCase()] || [];
+          const matchedItems = fabricStocks.filter(f =>
+            aliases.some(a => a.toLowerCase() === f.name.trim().toLowerCase())
+          );
+          if (matchedItems.length > 0) {
+            const sumYards = matchedItems.reduce((s, x) => s + x.warehouseYards, 0);
+            stockInfo = {
+              warehouseYards: Math.round(sumYards * 100) / 100,
+              warehouseRolls: Math.round((sumYards / YARDS_PER_ROLL) * 100) / 100,
+              cutterYards: matchedItems[0].cutterYards,
+              cutterRolls: matchedItems[0].cutterRolls,
+              unitPriceRoll: matchedItems[0].unitPriceRoll,
+              unitPriceYard: matchedItems[0].unitPriceYard
+            };
+          } else {
+            stockInfo = {
+              warehouseRolls: 0,
+              warehouseYards: 0,
+              cutterYards: 0,
+              cutterRolls: 0,
+              unitPriceRoll: 2500,
+              unitPriceYard: 50
+            };
+          }
+        }
 
         const grossYards = group.grossYardsNeeded;
         const grossExactRolls = Math.round((grossYards / YARDS_PER_ROLL) * 100) / 100;
