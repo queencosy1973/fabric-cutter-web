@@ -171,26 +171,491 @@
     </section>
 
     <!-- Main Navigation Tabs -->
-    <nav class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs no-print">
-      <button data-tab="tab-weekly-plan" class="tab-btn active flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
-        <span>📅 1. วางแผนรายสัปดาห์ & คำนวณม้วนส่งช่าง</span>
+    <nav class="flex flex-wrap gap-1.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs no-print">
+      <button data-tab="tab-admin-routine" class="tab-btn active flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>📋 1. ใบเบิกผ้าช่างตัด & ใบสั่งตัดนอก (Routine)</span>
       </button>
-      <button data-tab="tab-return-verify" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
-        <span>✂️ 2. ตรวจนับผ้าตัดส่งกลับตามรุ่น</span>
+      <button data-tab="tab-cut-sew-stock" class="tab-btn flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>🧵 2. ผ้าจับชุดตัด-เย็บ & เช็คโครง/ช่างหุ้ม</span>
+      </button>
+      <button data-tab="tab-preorder-billing" class="tab-btn flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>📊 3. รีพอร์ต Pre-Order (ขา/เกียร์) & บิลค่าตัด</span>
+      </button>
+      <button data-tab="tab-weekly-plan" class="tab-btn flex-1 min-w-[180px] py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>📅 4. แผน BOM รายสัปดาห์</span>
+      </button>
+      <button data-tab="tab-return-verify" class="tab-btn flex-1 min-w-[180px] py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>✂️ 5. ตรวจนับผ้าตัดส่งกลับ</span>
         <span id="nav-badge-pending" class="px-2 py-0.5 text-[10px] rounded-full bg-rose-100 text-rose-700 font-bold">0</span>
       </button>
-      <button data-tab="tab-fabric-stock" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
-        <span>📦 3. สต็อกผ้าคงเหลือ (ม้วน/หลา) & รับผ้าเข้าใหม่</span>
+      <button data-tab="tab-fabric-stock" class="tab-btn flex-1 min-w-[180px] py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>📦 6. สต็อกผ้าม้วนในคลัง</span>
       </button>
-      <button data-tab="tab-cutter-ledger" class="tab-btn flex-1 min-w-[210px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-2">
-        <span>🤝 4. บัญชีเศษผ้าค้างที่ช่าง & สูตร BOM ผ้า</span>
+      <button data-tab="tab-cutter-ledger" class="tab-btn flex-1 min-w-[180px] py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>🤝 7. บัญชีเศษผ้าช่าง & สูตร BOM</span>
       </button>
     </nav>
 
     <!-- =================================================================== -->
-    <!-- TAB 1: WEEKLY PLAN & ROLL DISPATCH CALCULATOR                       -->
+    <!-- NEW TAB 1: ADMIN ROUTINE CUTTING MATRIX & OUTSOURCE ORDER SHEET     -->
     <!-- =================================================================== -->
-    <section id="tab-weekly-plan" class="tab-pane space-y-6">
+    <section id="tab-admin-routine" class="tab-pane space-y-5">
+      <!-- Top Control Bar -->
+      <div class="bg-white rounded-2xl p-5 border-2 border-indigo-200 shadow-xs space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 mb-1">
+              ✨ ระบบงาน Routine จริงของแอดมิน (ซิงค์จากชีต "ใบเบิกผ้า ช่างตัด 69" & "สั่งตัดนอก")
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">
+              📋 ตารางคำนวณตัดผ้าตามเบอร์สี × รุ่นโซฟา • รีเช็คผ้าคงเหลือช่างนอก • คิดค่าแรงตัด & ออกใบสั่งตัดนอก
+            </h2>
+            <p class="text-xs text-slate-500">
+              แก้ไขตัวเลขในตารางได้ทันที ระบบคำนวณรวมหลา, จำนวนม้วน (สูตรปกติ ÷50 หรือ สูตรคุณบุญแยกตามรุ่น), ยอดผ้าคงเหลือที่ช่างนอก, ค่าผ้า และค่าแรงตัด (10/8/20/30 ฿) พร้อมซิงค์ขึ้น Supabase Cloud อัตโนมัติ
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-routine-pull-shortages" type="button" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="ดึงรายการที่ติดลบจากตารางผ้าจับชุดตัด-เย็บ (แท็บ 2) มาลงตารางตัดผ้ารอบนี้ทันที">
+              ⚡ ดึงยอดติดลบจากสต็อกผ้าตัด-เย็บ
+            </button>
+            <button id="btn-routine-new-round" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+              ➕ สร้างรอบตัดผ้าใหม่ (ยกยอดคงเหลือ)
+            </button>
+            <button id="btn-routine-sync-stock" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+              🚀 ซิงค์ยอดคงเหลือช่างเข้าคลังกลาง
+            </button>
+            <button id="btn-routine-export-excel" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+              📥 ส่งออก Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+
+        <!-- Round Selector & Formula Mode Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">เลือกรอบใบเบิกผ้า / รอบสั่งตัดนอก</label>
+            <select id="admin-routine-round-select" class="w-full px-3 py-2 bg-white border-2 border-indigo-400 rounded-xl text-xs font-bold text-indigo-950 focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            </select>
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">ชื่อหัวตารางรอบตัดผ้า</label>
+            <input type="text" id="routine-round-meta-title" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">วันที่ส่งผ้าให้ช่าง</label>
+            <input type="date" id="routine-round-send-date" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold">
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">สูตรคำนวณจำนวนม้วนสั่งผ้า</label>
+            <select id="routine-formula-mode" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-fuchsia-900">
+              <option value="STANDARD">สูตรมาตรฐานแอดมิน (รวมเบิกหลา ÷ 50)</option>
+              <option value="BOON">สูตรคุณบุญ (แยกม้วนตามรุ่น 1:15, 1:11, 1:25, 1:7, 1:8, 1:5)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sub-KPI Bar & View Mode Switcher -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-view-mode-matrix" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-xs transition">
+              🧮 มุมมองที่ 1: ตารางคำนวณเบิกผ้า + รีเช็คผ้าคงเหลือ + ค่าแรงตัด (ใบเบิกผ้า ช่างตัด 69)
+            </button>
+            <button id="btn-view-mode-outsource" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+              🖨️ มุมมองที่ 2: ใบสั่งผลิตส่งช่างตัดนอก (แยก L-mini ซ้าย/ขวา • ซ่อนราคาผ้า)
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 text-xs bg-indigo-950 text-white px-4 py-2 rounded-xl">
+            <div>รวมสั่งตัด: <strong id="routine-kpi-total-sets" class="text-amber-300">0 ชุด</strong></div>
+            <span class="text-slate-600">|</span>
+            <div>รวมใช้ผ้า: <strong id="routine-kpi-total-yards" class="text-emerald-300">0 หลา</strong></div>
+            <span class="text-slate-600">|</span>
+            <div>งบค่าผ้า: <strong id="routine-kpi-fabric-cost" class="text-amber-300">฿0</strong></div>
+            <span class="text-slate-600">|</span>
+            <div>ค่าแรงช่างตัด: <strong id="routine-kpi-cut-wage" class="text-fuchsia-300">฿0</strong></div>
+          </div>
+        </div>
+
+        <!-- VIEW 1: FULL ADMIN CUTTING & RECHECK MATRIX TABLE -->
+        <div id="routine-matrix-view-wrap" class="space-y-3">
+          <div class="overflow-x-auto custom-scrollbar border-2 border-slate-300 rounded-xl shadow-inner max-h-[680px]">
+            <table class="w-full text-left border-collapse">
+              <thead class="sticky top-0 z-20">
+                <tr class="bg-slate-900 text-white text-[10px] uppercase border-b border-slate-700">
+                  <th rowspan="2" class="py-2 px-2 sticky left-0 bg-slate-900 z-30 border-r border-slate-700 min-w-[92px]">เบอร์สี<br>SKU</th>
+                  <th rowspan="2" class="py-2 px-2 sticky left-[92px] bg-slate-900 z-30 border-r border-slate-700 min-w-[78px]">สีผ้า</th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">CS2 / 2PL - New<br><span class="text-[9px] text-indigo-300">3.2Y | 1:15 | ค่าตัด 10฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">CS3 / 3PL - New<br><span class="text-[9px] text-indigo-200">4.33Y | 1:11 | ค่าตัด 10฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">เฉพาะแขน (New)<br><span class="text-[9px] text-indigo-300">1.93Y | 1:25 | ค่าตัด 8฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">RS หัวกระดก<br><span class="text-[9px] text-indigo-200">6.26Y | 1:7 | ค่าตัด 20฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">LN3 กระดุม 19 เม็ด<br><span class="text-[9px] text-indigo-300">6.21Y | 1:8 | ค่าตัด 20฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">LN กระดุม 5 เม็ด<br><span class="text-[9px] text-indigo-200">6.17Y | 1:8 | ค่าตัด 20฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">PN Lit ปรับนอน<br><span class="text-[9px] text-indigo-300">6.65Y | 1:7 | ค่าตัด 20฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-fuchsia-950 border-l border-slate-700">L Mini (ซ้าย L / ขวา R)<br><span class="text-[9px] text-fuchsia-300">8.97Y | 1:5 | ค่าตัด 30฿</span></th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">L ใหญ่<br><span class="text-[9px] text-indigo-200">11.0Y | 1:4 | ค่าตัด 30฿</span></th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-indigo-950 border-l-2 border-indigo-400">รวมเบิก<br>(หลา)</th>
+                  <th rowspan="2" class="py-2 px-2 text-center bg-fuchsia-950">จำนวนไม้<br>ที่สั่ง/ม้วน</th>
+                  <th rowspan="2" class="py-2 px-1.5 text-center bg-slate-800">ราคา<br>/หลา</th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-slate-800">รวมยอด<br>ค่าผ้า (฿)</th>
+                  <th rowspan="2" class="py-2 px-2 text-center bg-amber-900 border-l border-amber-500">หักผ้าที่มี / สั่ง+<br>เผื่อผ้าให้ช่างตัด</th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-emerald-950">จำนวนหลา<br>ที่ส่งจริง</th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-slate-800">ยอดยกมา<br>คงเหลือ/หลา</th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-slate-900">จำนวนผ้า/หลา<br>คงเหลือตามสูตร</th>
+                  <th rowspan="2" class="py-2 px-2 text-right bg-amber-950">คงเหลือ/หลา<br>#ช่างนอก</th>
+                  <th rowspan="2" class="py-2 px-2 text-center bg-slate-900">หมายเหตุ<br>รีเช็ค</th>
+                </tr>
+                <tr class="bg-slate-800 text-slate-300 text-[9px] border-b border-slate-600">
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">คู่</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700 text-fuchsia-200">ซ้าย | ขวา</th><th class="py-1 px-1 text-right text-fuchsia-200">รวมหลา</th>
+                  <th class="py-1 px-1 text-center border-l border-slate-700">ตัว</th><th class="py-1 px-1 text-right">รวมหลา</th>
+                </tr>
+              </thead>
+              <tbody id="admin-routine-matrix-tbody"></tbody>
+              <tfoot id="admin-routine-matrix-tfoot"></tfoot>
+            </table>
+          </div>
+
+          <!-- Extra Spare Parts Note Bar at bottom of Sheet 1 -->
+          <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-xs font-bold text-rose-800 whitespace-nowrap">📌 หมายเหตุสั่งตัดอะไหล่ที่ขาดเพิ่มท้ายใบเบิกผ้า (ไม่มีค่าใช้จ่าย):</span>
+            <input type="text" id="routine-extra-spare-note" placeholder="เช่น 1. 356-1A ลูกฟูกครีมอ่อน (ที่นั่ง 2 ที่) ฝั่งขวา  2. 356-1A ลูกฟูกครีมอ่อน (ที่นั่งเบด เข้ามุม) ฝั่งซ้าย"
+              class="flex-1 px-3 py-1.5 bg-white border border-rose-300 rounded-lg text-xs font-semibold text-rose-950">
+          </div>
+        </div>
+
+        <!-- VIEW 2: OUTSOURCE PRODUCTION ORDER SHEET ("สั่งตัดนอก" แยก L-Mini ซ้าย/ขวา) -->
+        <div id="routine-outsource-view-wrap" class="hidden space-y-3">
+          <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-fuchsia-950">🖨️ ใบสั่งผลิตส่งช่างตัดนอก (รูปแบบชีต "สั่งตัดนอก" • แยก L-mini ซ้าย / ขวา)</h3>
+              <p class="text-xs text-fuchsia-700">ตัดคอลัมน์ราคาผ้าออกเพื่อให้พร้อมพิมพ์หรือแคปหน้าจอส่งให้ร้านตัดดอนเมือง / ช่าง P'บุญ ได้ทันที</p>
+            </div>
+            <button onclick="window.print()" type="button" class="px-3.5 py-2 rounded-xl bg-fuchsia-700 hover:bg-fuchsia-800 text-white text-xs font-bold shadow-xs">
+              🖨️ พิมพ์ใบสั่งตัดนอก
+            </button>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar border border-slate-300 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-white text-[11px] uppercase">
+                  <th rowspan="2" class="py-2.5 px-3">กลุ่มผ้า</th>
+                  <th rowspan="2" class="py-2.5 px-3">เบอร์สี SKU</th>
+                  <th rowspan="2" class="py-2.5 px-3">สี</th>
+                  <th rowspan="2" class="py-2.5 px-2 text-center bg-amber-900">จำนวนการส่งไม้<br>(ม้วน / ใช้ผ้าที่มี)</th>
+                  <th class="py-1.5 px-2 text-center">2 PL</th>
+                  <th class="py-1.5 px-2 text-center">3 PL</th>
+                  <th class="py-1.5 px-2 text-center">แขน New</th>
+                  <th class="py-1.5 px-2 text-center">กระดก</th>
+                  <th class="py-1.5 px-2 text-center">กระดุม 19 เม็ด</th>
+                  <th class="py-1.5 px-2 text-center">กระดุม 5 เม็ด</th>
+                  <th class="py-1.5 px-2 text-center">ปรับนอน</th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-fuchsia-950 border-x border-fuchsia-700">L-mini (Order สั่งผลิต)</th>
+                  <th rowspan="2" class="py-2.5 px-3">หมายเหตุสั่งช่างนอก</th>
+                </tr>
+                <tr class="bg-slate-800 text-slate-300 text-[10px]">
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center">Order</th>
+                  <th class="py-1 px-2 text-center bg-fuchsia-900 text-fuchsia-200">ซ้าย (L)</th>
+                  <th class="py-1 px-2 text-center bg-indigo-900 text-indigo-200">ขวา (R)</th>
+                </tr>
+              </thead>
+              <tbody id="admin-outsource-sheet-tbody"></tbody>
+              <tfoot id="admin-outsource-sheet-tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- NEW TAB 2: CUT & SEW STOCK ("ผ้าจับชุดตัด-เย็บ") & WOOD / WORKERS   -->
+    <!-- =================================================================== -->
+    <section id="tab-cut-sew-stock" class="tab-pane hidden space-y-6">
+      <!-- Part 2.1: Standard Models Cut-Sew Stock vs Pre-Order -->
+      <div class="bg-white rounded-2xl p-5 border-2 border-rose-200 shadow-xs space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 mb-1">
+              🧵 ซิงค์จากชีต "ตรวจสอบการทำงานช่างเดือน 11.69 ➔ ผ้าจับชุดตัด-เย็บ"
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">
+              ตารางเช็คยอด STOCK ผ้าตัดแล้วทั้งหมด (ไม่เย็บ + เย็บแล้ว) หักยอด Pre-Order เพื่อหาจำนวนที่ต้องสั่งตัดเพิ่ม
+            </h2>
+            <p class="text-xs text-slate-500">
+              สูตรคำนวณ: <strong>(ผ้าตัดยังไม่เย็บ + ผ้าเย็บแล้ว) - ยอด Pre-Order = คงเหลือหลังหัก Order</strong> • รายการที่ <strong>ติดลบ (-)</strong> คือต้องสั่งช่างตัดเพิ่ม!
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="cut-sew-shortage-summary" class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
+              ติดลบ 0 รายการ
+            </span>
+            <button id="btn-push-all-shortages-tab2" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow transition">
+              🚀 ส่งยอดที่ติดลบทั้งหมดเข้าใบเบิกผ้าช่างตัด (แท็บ 1)
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-xs font-semibold text-slate-600">กรองตามรุ่นโซฟา:</label>
+            <select id="filter-cut-sew-model" class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800">
+              <option value="ALL">แสดงทุกรุ่น (LN3, LN5, ปรับนอน RC, หัวกระดก RS, 3PL, แขน)</option>
+              <option value="ln3">กระดุม 19 เม็ด (LN3)</option>
+              <option value="ln5">กระดุม 5 เม็ด (LN5)</option>
+              <option value="rc">ปรับนอน (RC / PN-Lif)</option>
+              <option value="rs">หัวกระดก (RS)</option>
+              <option value="cs3">3PL (Cs3/Bs3/Lu3 เฉพาะตัว)</option>
+              <option value="arm">เฉพาะแขน (3ll - New)</option>
+            </select>
+            <label class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-200 cursor-pointer">
+              <input type="checkbox" id="chk-cut-sew-only-shortage" class="rounded text-rose-600">
+              <span>แสดงเฉพาะสีที่ติดลบ (ต้องสั่งตัดเพิ่ม)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl max-h-[520px]">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 z-10">
+              <tr class="bg-slate-900 text-white text-[11px] uppercase">
+                <th class="py-2.5 px-3">ชื่อรุ่น</th>
+                <th class="py-2.5 px-2">ชนิดผ้า</th>
+                <th class="py-2.5 px-2">รหัส SKU</th>
+                <th class="py-2.5 px-2">สี</th>
+                <th class="py-2.5 px-2 text-center bg-amber-900">ไม่เย็บ<br>(ชุด)</th>
+                <th class="py-2.5 px-2 text-center bg-emerald-900">เย็บแล้ว<br>(ชุด)</th>
+                <th class="py-2.5 px-3 text-center bg-slate-800">รวมยอด STOCK<br>ทั้งหมด</th>
+                <th class="py-2.5 px-2 text-center bg-indigo-900">หัก Pre-Order<br>(ชุด)</th>
+                <th class="py-2.5 px-3 text-center bg-rose-950">**คงเหลือหลังหัก<br>Order</th>
+                <th class="py-2.5 px-2 text-center">สั่งตัดเพิ่มด่วน</th>
+              </tr>
+            </thead>
+            <tbody id="cut-sew-standard-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 2.2: L-Mini Split Left / Right Cut-Sew Stock -->
+      <div class="bg-white rounded-2xl p-5 border border-fuchsia-200 shadow-xs space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">
+            🛋️ ตารางยอด STOCK ผ้าตัด-เย็บ รุ่น L-mini (แยกฝั่ง ซ้าย L / ขวา R หัก Order รอส่ง)
+          </h3>
+          <p class="text-xs text-slate-500">
+            ติดตามสต็อกผ้า L-mini แยกชิ้นฝั่งซ้าย (L) และฝั่งขวา (R) ทั้งแบบยังไม่เย็บและเย็บแล้ว
+          </p>
+        </div>
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl max-h-96">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 z-10">
+              <tr class="bg-slate-900 text-white text-[11px] uppercase">
+                <th class="py-2 px-2">ชนิดผ้า</th>
+                <th class="py-2 px-2">SKU</th>
+                <th class="py-2 px-2">สี</th>
+                <th class="py-2 px-2 text-center bg-amber-900">ไม่เย็บ ซ้าย (L)</th>
+                <th class="py-2 px-2 text-center bg-amber-900">ไม่เย็บ ขวา (R)</th>
+                <th class="py-2 px-2 text-center bg-emerald-900">เย็บ ซ้าย (L)</th>
+                <th class="py-2 px-2 text-center bg-emerald-900">เย็บ ขวา (R)</th>
+                <th class="py-2 px-2 text-center bg-slate-800">รวม STOCK L-mini</th>
+                <th class="py-2 px-2 text-center bg-indigo-900">Order ซ้าย (L)</th>
+                <th class="py-2 px-2 text-center bg-indigo-900">Order ขวา (R)</th>
+                <th class="py-2 px-2 text-center bg-rose-950">คงเหลือ ซ้าย (L)</th>
+                <th class="py-2 px-2 text-center bg-rose-950">คงเหลือ ขวา (R)</th>
+              </tr>
+            </thead>
+            <tbody id="cut-sew-lmini-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 2.3 & 2.4: Low Stock CS/BS/LU Matrix & Wood Frame + Upholsterers -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-12 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900">⚠️ อัพเดท STOCK ผ้าคงเหลือน้อย (ตระกูล CS2 / CS3 เฉพาะตัว เทียบ BS2-3 / LU2-3 รวมแขน)</h3>
+            <span class="text-xs font-semibold text-rose-600">* สีแดง = ใกล้หมด (≤15 ตัว)</span>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                  <th class="py-2.5 px-3">รุ่น</th>
+                  <th class="py-2.5 px-2 text-center">หนังครีม</th>
+                  <th class="py-2.5 px-2 text-center">หนังน้ำตาล</th>
+                  <th class="py-2.5 px-2 text-center">หนังดำ</th>
+                  <th class="py-2.5 px-2 text-center">หนังเทา</th>
+                  <th class="py-2.5 px-2 text-center">หนังมอคค่า</th>
+                  <th class="py-2.5 px-2 text-center">H-น้ำตาล</th>
+                  <th class="py-2.5 px-2 text-center">H-เขียว</th>
+                  <th class="py-2.5 px-2 text-center">H-โรสโกลด์</th>
+                  <th class="py-2.5 px-2 text-center">H-แดง</th>
+                  <th class="py-2.5 px-2 text-center">H-เทา</th>
+                  <th class="py-2.5 px-2 text-center">H-น้ำเงิน</th>
+                </tr>
+              </thead>
+              <tbody id="cs-bs-lu-matrix-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lg:col-span-12 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">🪵 สรุปสต็อกโครงไม้คงเหลือ & รายชื่อทีมช่างหุ้มประจำรุ่น (จากชีต "ตรวจสอบการทำงานช่างเดือน 11.69")</h3>
+            <p class="text-xs text-slate-500">ตรวจสอบความพร้อมของโครงไม้ (ช่างไม้ขึ้นโครงเสร็จ หัก ช่างหุ้มดึงไปทำ) คู่กับผ้าที่ตัดเสร็จแล้ว</p>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                  <th class="py-2.5 px-3">รุ่นสินค้า</th>
+                  <th class="py-2.5 px-2 text-center">ยอดช่างไม้ขึ้นโครงเสร็จ</th>
+                  <th class="py-2.5 px-2 text-center">ช่างหุ้มดึงไปทำแล้ว</th>
+                  <th class="py-2.5 px-3 text-center bg-emerald-50 text-emerald-900">สต็อกโครงไม้คงเหลือ</th>
+                  <th class="py-2.5 px-3">ทีมช่างหุ้มประจำรุ่น (16 คน)</th>
+                  <th class="py-2.5 px-3">หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody id="wood-frame-stock-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- NEW TAB 3: PRE-ORDER DAILY (LEGS/GEARS) + SPARE PARTS + BILLING     -->
+    <!-- =================================================================== -->
+    <section id="tab-preorder-billing" class="tab-pane hidden space-y-6">
+      <!-- Part 3.1: Pre-Order Summary + Legs & Gears Calculator -->
+      <div class="bg-white rounded-2xl p-5 border border-indigo-200 shadow-xs space-y-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 mb-1">
+            📊 ซิงค์จากชีต "แยกPre-Order ตัด พ.ย / ต.ค"
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">
+            ตารางสรุปรีพอร์ต #Pre-Order งานตัด TT-Shopee แยกตามรุ่นและสี พร้อมคำนวณหลา/ม้วน, ขาโซฟา 1" (ถุงละ 500) และเกียร์ปรับนอน (ลังละ 15)
+          </h2>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900 text-white text-[11px] uppercase">
+                <th class="py-2.5 px-3">รอบวันที่ Pre-Order</th>
+                <th class="py-2.5 px-3">รุ่นโซฟา</th>
+                <th class="py-2.5 px-3">แยกจำนวนตามเบอร์สีผ้า</th>
+                <th class="py-2.5 px-3 text-center">รวม (ตัว)</th>
+                <th class="py-2.5 px-3 text-right">ใช้ผ้า (หลา / ม้วน)</th>
+                <th class="py-2.5 px-3 text-right bg-amber-900">ขาโซฟา 1" (6 ขา/ตัว)<br><span class="text-[10px] text-amber-200">แปลงเป็นถุง (÷500)</span></th>
+                <th class="py-2.5 px-3 text-right bg-emerald-900">เกียร์ปรับนอน (1 คู่/ตัว)<br><span class="text-[10px] text-emerald-200">แปลงเป็นลัง (÷15)</span></th>
+              </tr>
+            </thead>
+            <tbody id="preorder-daily-tbody"></tbody>
+            <tfoot id="preorder-daily-tfoot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 3.2: Monthly Cutter Billing & 3-Supplier Fabric Summary -->
+      <div class="bg-white rounded-2xl p-5 border border-emerald-200 shadow-xs space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">
+            💰 รายงานเช็คยอดบิลค่าแรงตัดร้านดอนเมือง & สรุปจำนวนผ้าที่ใช้แยกตาม 4 ชนิดผ้า (จากชีต "รวมยอดสั่งตัดผ้า พ.ย / ต.ค 69")
+          </h3>
+          <p class="text-xs text-slate-500">
+            สรุปยอดชุดสั่งตัด ค่าแรงช่างตัดผ้ารวม และปริมาณหลาที่ส่งตัดแยกตาม PVC (32฿), ลูกฟูก (53฿), ฮอลแลนด์ (53฿), และนาโน (54฿)
+          </p>
+        </div>
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                <th class="py-2.5 px-3">ชื่อรอบตัดผ้า</th>
+                <th class="py-2.5 px-3">วันที่ส่งผ้า</th>
+                <th class="py-2.5 px-2 text-center">รวมชุดที่ตัด</th>
+                <th class="py-2.5 px-3 text-right bg-emerald-50 text-emerald-900">รวมค่าแรงตัดช่าง (บาท)</th>
+                <th class="py-2.5 px-3 text-right">ส่งผ้า PVC (หลา)</th>
+                <th class="py-2.5 px-3 text-right">ส่งผ้าลูกฟูก (หลา)</th>
+                <th class="py-2.5 px-3 text-right">ส่งผ้าฮอลแลนด์ (หลา)</th>
+                <th class="py-2.5 px-3 text-right">ส่งผ้านาโน (หลา)</th>
+                <th class="py-2.5 px-3 text-right bg-amber-50 text-amber-900">มูลค่าผ้าตามสูตร (บาท)</th>
+              </tr>
+            </thead>
+            <tbody id="monthly-billing-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 3.3: Extra Spare Parts Cutting Registry ("ตัดอะไหล่ชิ้นส่วนเพิ่ม") -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">
+            🧩 ทะเบียนสั่งตัดอะไหล่ชิ้นส่วนที่ขาดเพิ่ม (จากผ้าที่มีอยู่กับช่าง • ไม่มีค่าใช้จ่าย)
+          </h3>
+          <p class="text-xs text-slate-500">
+            ซิงค์จากชีต "สั่งตัดนอก ➔ ตัดอะไหล่ชิ้นส่วนเพิ่ม" เช่น หลังพิง #2, ปิดหลัง #9, แขน New 3 ชิ้นส่วน #1,3,5, ที่นั่ง L-mini #18
+          </p>
+        </div>
+
+        <form id="form-add-spare-part" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">รุ่นโซฟา</label>
+            <input type="text" id="sp-input-model" placeholder="เช่น L-mini, 3PL, ปรับนอน" required class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">รายงานชิ้นส่วนที่ขาด (ระบุเบอร์ชิ้นส่วน)</label>
+            <input type="text" id="sp-input-part" placeholder="เช่น ที่นั่ง 2 ที่ #18 (ฝั่งขวา) / หลังพิง #2" required class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">สีผ้า / รหัสผ้า</label>
+            <input type="text" id="sp-input-color" placeholder="เช่น 356-1A ลูกฟูกครีมอ่อน" required class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs">
+          </div>
+          <div class="sm:col-span-1">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">จำนวนชิ้น</label>
+            <input type="number" id="sp-input-qty" min="1" value="1" required class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center">
+          </div>
+          <div class="sm:col-span-2">
+            <button type="submit" class="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow">
+              + เพิ่มอะไหล่สั่งตัด
+            </button>
+          </div>
+        </form>
+
+        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-200">
+                <th class="py-2.5 px-3">รุ่น</th>
+                <th class="py-2.5 px-3">รายงานชิ้นส่วน (#เบอร์แบบ)</th>
+                <th class="py-2.5 px-3">สีผ้า</th>
+                <th class="py-2.5 px-2 text-center">จำนวนที่สั่ง (ชิ้น)</th>
+                <th class="py-2.5 px-2 text-center">จำนวนตัดได้จริง</th>
+                <th class="py-2.5 px-3 text-center">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="spare-parts-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 4: WEEKLY PLAN & ROLL DISPATCH CALCULATOR                       -->
+    <!-- =================================================================== -->
+    <section id="tab-weekly-plan" class="tab-pane hidden space-y-6">
 
       <!-- Action Bar: Add / Import Plan -->
       <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
@@ -667,6 +1132,7 @@
   <script src="sku-mapper.js"></script>
   <script src="seed.js"></script>
   <script src="fabric-store.js"></script>
+  <script src="admin-routine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -211,10 +211,13 @@
       this.isApplyingRemote = true;
       try {
         this.state = {
+          ...this.state,
+          ...remoteState,
           weeklyPlan: Array.isArray(remoteState.weeklyPlan) ? remoteState.weeklyPlan : this.state.weeklyPlan,
           cutterBalance: remoteState.cutterBalance || this.state.cutterBalance,
           cuttingBatches: Array.isArray(remoteState.cuttingBatches) ? remoteState.cuttingBatches : this.state.cuttingBatches,
-          cutterLedger: Array.isArray(remoteState.cutterLedger) ? remoteState.cutterLedger : this.state.cutterLedger
+          cutterLedger: Array.isArray(remoteState.cutterLedger) ? remoteState.cutterLedger : this.state.cutterLedger,
+          adminRoutine: remoteState.adminRoutine || this.state.adminRoutine || null
         };
         this.ensureCutterBalanceEntries();
         localStorage.setItem(FABRIC_CUTTER_STATE_KEY, JSON.stringify(this.state));
@@ -615,10 +618,12 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           this.state = {
+            ...parsed,
             weeklyPlan: parsed.weeklyPlan || [],
             cutterBalance: parsed.cutterBalance || {},
             cuttingBatches: parsed.cuttingBatches || [],
-            cutterLedger: parsed.cutterLedger || []
+            cutterLedger: parsed.cutterLedger || [],
+            adminRoutine: parsed.adminRoutine || null
           };
         } else {
           this.seedInitialCutterDemo();

@@ -44,6 +44,9 @@
     populateSkuDatalist();
     populateInboundFabricSelect();
     setupEventListeners();
+    if (window.AdminRoutineController) {
+      window.AdminRoutineController.init(store);
+    }
     renderAll();
 
     store.subscribe(() => {
@@ -112,7 +115,11 @@
     renderReturnVerifyTab();
     renderFabricStockTab();
     renderCutterLedgerTab();
+    if (window.AdminRoutineController) {
+      window.AdminRoutineController.renderAll();
+    }
   }
+  window.switchFabricTab = switchTab;
 
   // =========================================================
   // TOP 4 KPI CARDS
