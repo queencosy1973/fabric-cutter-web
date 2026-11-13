@@ -17,46 +17,47 @@
 
   // Columns in Admin's "ใบเบิกผ้า ช่างตัด 69" & "สั่งตัดนอก"
   const ROUTINE_MODELS = [
-    { key: 'cs2', label: 'CS2 / 2PL - New', shortLabel: '2 PL', yardsPerUnit: 3.20, piecesPerRoll: 15, cutWage: 10 },
-    { key: 'cs3', label: 'CS3 / 3PL - New', shortLabel: '3 PL', yardsPerUnit: 4.33, piecesPerRoll: 11, cutWage: 10 },
-    { key: 'arm', label: 'เฉพาะแขน (New)', shortLabel: 'แขน New', yardsPerUnit: 1.93, piecesPerRoll: 25, cutWage: 8 },
-    { key: 'rs',  label: 'RS หัวกระดก', shortLabel: 'กระดก', yardsPerUnit: 6.26, piecesPerRoll: 7, cutWage: 20 },
-    { key: 'ln3', label: 'LN3 กระดุม 19 เม็ด', shortLabel: 'กระดุม 19 เม็ด', yardsPerUnit: 6.21, piecesPerRoll: 8, cutWage: 20 },
-    { key: 'ln5', label: 'LN กระดุม 5 เม็ด', shortLabel: 'กระดุม 5 เม็ด', yardsPerUnit: 6.17, piecesPerRoll: 8, cutWage: 20 },
-    { key: 'rc',  label: 'PN Lit ปรับนอน', shortLabel: 'ปรับนอน', yardsPerUnit: 6.65, piecesPerRoll: 7, cutWage: 20 },
-    { key: 'lmini', label: 'L Mini (รวม ซ้าย+ขวา)', shortLabel: 'L-mini', yardsPerUnit: 8.97, piecesPerRoll: 5, cutWage: 30, hasLR: true },
-    { key: 'lbig',  label: 'L ใหญ่', shortLabel: 'L ใหญ่', yardsPerUnit: 11.00, piecesPerRoll: 4, cutWage: 30 }
+    { key: 'cs2', label: 'CS2 / 2PL - New', shortLabel: '2 PL', yardsPerUnit: 3.20, yards: 3.20, legs: 6, gear: 0, piecesPerRoll: 15, cutWage: 10 },
+    { key: 'cs3', label: 'CS3 / 3PL - New', shortLabel: '3 PL', yardsPerUnit: 4.33, yards: 4.33, legs: 6, gear: 0, piecesPerRoll: 11, cutWage: 10 },
+    { key: 'arm', label: 'เฉพาะแขน (New)', shortLabel: 'แขน New', yardsPerUnit: 1.93, yards: 1.93, legs: 0, gear: 0, piecesPerRoll: 25, cutWage: 8 },
+    { key: 'rs',  label: 'RS หัวกระดก', shortLabel: 'กระดก', yardsPerUnit: 6.26, yards: 6.26, legs: 6, gear: 1, piecesPerRoll: 7, cutWage: 20 },
+    { key: 'ln3', label: 'LN3 กระดุม 19 เม็ด', shortLabel: 'กระดุม 19 เม็ด', yardsPerUnit: 6.21, yards: 6.21, legs: 6, gear: 0, piecesPerRoll: 8, cutWage: 20 },
+    { key: 'ln5', label: 'LN กระดุม 5 เม็ด', shortLabel: 'กระดุม 5 เม็ด', yardsPerUnit: 6.17, yards: 6.17, legs: 6, gear: 0, piecesPerRoll: 8, cutWage: 20 },
+    { key: 'rc',  label: 'PN Lit ปรับนอน', shortLabel: 'ปรับนอน', yardsPerUnit: 6.65, yards: 6.65, legs: 6, gear: 1, piecesPerRoll: 7, cutWage: 20 },
+    { key: 'lmini', label: 'L Mini (รวม ซ้าย+ขวา)', shortLabel: 'L-mini', yardsPerUnit: 8.97, yards: 8.97, legs: 8, gear: 0, piecesPerRoll: 5, cutWage: 30, hasLR: true },
+    { key: 'lbig',  label: 'L ใหญ่', shortLabel: 'L ใหญ่', yardsPerUnit: 11.00, yards: 11.00, legs: 10, gear: 0, piecesPerRoll: 4, cutWage: 30 }
   ];
 
   // Master Fabric Rows in Admin's Routine Table (mapped to Stock Movement fabricName)
   const ROUTINE_FABRICS = [
-    { sku: 'PQ002C-06', color: 'ครีม', group: 'PVC หนัง', price: 32, stockName: 'ครีม-PQ002C-6' },
-    { sku: 'PQ002C-12', color: 'น้ำตาล', group: 'PVC หนัง', price: 32, stockName: 'น้ำตาล-PQ002C-12' },
-    { sku: 'PQ002C-19', color: 'ชา', group: 'PVC หนัง', price: 32, stockName: 'ชา-PQ002C-19' },
-    { sku: 'PQ002C-17', color: 'ดำ', group: 'PVC หนัง', price: 30, stockName: 'ดำ-PQ002C-17' },
-    { sku: 'PQ002C-46', color: 'เทา', group: 'PVC หนัง', price: 32, stockName: 'เทา-PQ002C-46' },
-    { sku: 'PQ002C-48', color: 'มอค่า', group: 'PVC หนัง', price: 32, stockName: 'มอคค่า-PQ002C-48' },
-    { sku: 'MJ 356-1A', color: 'LF ครีม', group: 'ลูกฟูก', price: 32, stockName: 'สีครีม-MJ356-1a' },
-    { sku: 'MJ 356-2A', color: 'LF เขียว', group: 'ลูกฟูก', price: 53, stockName: 'สีเขียว-MJ356-2a' },
-    { sku: 'MJ 356-3A', color: 'LF เทา', group: 'ลูกฟูก', price: 53, stockName: 'สีเทา-MJ356-3a' },
-    { sku: 'MJ 356-4A', color: 'LF น้ำตาล', group: 'ลูกฟูก', price: 53, stockName: 'สีน้ำตาล-MJ356-4a' },
-    { sku: '337-07', color: 'น้ำตาลทอง', group: 'Hollan', price: 53, stockName: 'สีน้ำตาล-MJ337-7' },
-    { sku: '337-08', color: 'น้ำตาล', group: 'Hollan', price: 53, stockName: 'สีน้ำตาล-MJ337-7' },
-    { sku: '337-14', color: 'เขียว', group: 'Hollan', price: 53, stockName: 'สีเขียว-MJ337-14' },
-    { sku: '337-22', color: 'โรสโกลด์', group: 'Hollan', price: 53, stockName: 'สีโรสโกลด์-MJ337-22' },
-    { sku: '337-23', color: 'แดง', group: 'Hollan', price: 53, stockName: 'สีแดงมะเหมี่ยว-MJ337-23' },
-    { sku: '337-26', color: 'เทาอ่อน', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
-    { sku: '337-29', color: 'เทาควัน', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
-    { sku: '337-30', color: 'เทาอมเขียว', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
-    { sku: '337-31', color: 'น้ำเงิน', group: 'Hollan', price: 53, stockName: 'สีน้ำเงิน-MJ337-31' },
-    { sku: '736B-01', color: 'ครีม (น้ำตาลทอง)', group: 'นาโน', price: 54, stockName: 'สีน้ำตาลทอง-736b-01' },
-    { sku: '736B-02', color: 'เทาเข้ม', group: 'นาโน', price: 54, stockName: 'สีเทาเข้ม-736b-02' },
-    { sku: '736B-04', color: 'ฟ้าเทา', group: 'นาโน', price: 54, stockName: 'สีฟ้าเทา-736b-04' }
+    { sku: 'PQ002C-06', shortCode: 'PQ002C-6', aliases: ['pq002c-06', 'pq002c-6', 'pq002c-1', 'pq002c-01', 'c-06', 'c-6', 'หนังครีม', 'ครีมเรียบ'], color: 'ครีม', group: 'PVC หนัง', price: 32, stockName: 'ครีม-PQ002C-6' },
+    { sku: 'PQ002C-12', shortCode: 'PQ002C-12', aliases: ['pq002c-12', 'c-12', 'หนังน้ำตาล', 'น้ำตาลเรียบ'], color: 'น้ำตาล', group: 'PVC หนัง', price: 32, stockName: 'น้ำตาล-PQ002C-12' },
+    { sku: 'PQ002C-19', shortCode: 'PQ002C-19', aliases: ['pq002c-19', 'c-19', 'หนังชา', 'ชาเรียบ'], color: 'ชา', group: 'PVC หนัง', price: 32, stockName: 'ชา-PQ002C-19' },
+    { sku: 'PQ002C-17', shortCode: 'PQ002C-17', aliases: ['pq002c-17', 'c-17', 'หนังดำ', 'ดำเรียบ'], color: 'ดำ', group: 'PVC หนัง', price: 30, stockName: 'ดำ-PQ002C-17' },
+    { sku: 'PQ002C-46', shortCode: 'PQ002C-46', aliases: ['pq002c-46', 'pq002c-28', 'c-46', 'c-28', 'หนังเทา', 'เทาเรียบ'], color: 'เทา', group: 'PVC หนัง', price: 32, stockName: 'เทา-PQ002C-46' },
+    { sku: 'PQ002C-48', shortCode: 'PQ002C-48', aliases: ['pq002c-48', 'c-48', 'หนังมอคค่า', 'มอคค่าเรียบ', 'มอคค่า'], color: 'มอค่า', group: 'PVC หนัง', price: 32, stockName: 'มอคค่า-PQ002C-48' },
+    { sku: 'MJ 356-1A', shortCode: '356-1A', aliases: ['mj356-1a', 'mj 356-1a', '356-1a', 'pkd 356-1a', 'mj350-4', '350-04', '350-4', 'lf ครีม', 'ลูกฟูกสีครีม', 'ครีมลูกฟูก'], color: 'LF ครีม', group: 'ลูกฟูก', price: 32, stockName: 'สีครีม-MJ356-1a' },
+    { sku: 'MJ 356-2A', shortCode: '356-2A', aliases: ['mj356-2a', 'mj 356-2a', '356-2a', 'pkd 356-2a', 'lf เขียว', 'ลูกฟูกสีเขียว', 'เขียวลูกฟูก'], color: 'LF เขียว', group: 'ลูกฟูก', price: 53, stockName: 'สีเขียว-MJ356-2a' },
+    { sku: 'MJ 356-3A', shortCode: '356-3A', aliases: ['mj356-3a', 'mj 356-3a', '356-3a', 'pkd 356-3a', 'lf เทา', 'ลูกฟูกสีเทา', 'ลูกฟูกเทา'], color: 'LF เทา', group: 'ลูกฟูก', price: 53, stockName: 'สีเทา-MJ356-3a' },
+    { sku: 'MJ 356-4A', shortCode: '356-4A', aliases: ['mj356-4a', 'mj 356-4a', '356-4a', 'pkd 356-4a', 'lf น้ำตาล', 'lf  น้ำตาล', 'ลูกฟูกสีน้ำตาล'], color: 'LF น้ำตาล', group: 'ลูกฟูก', price: 53, stockName: 'สีน้ำตาล-MJ356-4a' },
+    { sku: '337-07', shortCode: '337-7', aliases: ['337-07', '337-7', 'mj337-7', 'mj337-07', 'ฮอลแลนด์น้ำตาล', 'น้ำตาลฮอลแลนด์'], color: 'น้ำตาลทอง', group: 'Hollan', price: 53, stockName: 'สีน้ำตาล-MJ337-7' },
+    { sku: '337-08', shortCode: '337-8', aliases: ['337-08', '337-8', 'mj337-8'], color: 'น้ำตาล', group: 'Hollan', price: 53, stockName: 'สีน้ำตาล-MJ337-7' },
+    { sku: '337-14', shortCode: '337-14', aliases: ['337-14', 'mj337-14', 'ฮอลแลนด์เขียว', 'ฮอลแลนด์สีเขียว'], color: 'เขียว', group: 'Hollan', price: 53, stockName: 'สีเขียว-MJ337-14' },
+    { sku: '337-22', shortCode: '337-22', aliases: ['337-22', 'mj337-22', 'โรสโกลด์', 'ฮอลแลนด์โรสโกลด์'], color: 'โรสโกลด์', group: 'Hollan', price: 53, stockName: 'สีโรสโกลด์-MJ337-22' },
+    { sku: '337-23', shortCode: '337-23', aliases: ['337-23', 'mj337-23', 'ฮอลแลนด์แดง', 'ฮอลแลนด์สีแดง'], color: 'แดง', group: 'Hollan', price: 53, stockName: 'สีแดงมะเหมี่ยว-MJ337-23' },
+    { sku: '337-26', shortCode: '337-26', aliases: ['337-26', '337-28', '337-25', 'เทาอ่อน'], color: 'เทาอ่อน', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
+    { sku: '337-29', shortCode: '337-29', aliases: ['337-29', 'mj337-29', 'เทาควัน', 'ฮอลแลนด์เทา', 'เทาฮอลแลนด์'], color: 'เทาควัน', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
+    { sku: '337-30', shortCode: '337-30', aliases: ['337-30', 'เทาอมเขียว'], color: 'เทาอมเขียว', group: 'Hollan', price: 53, stockName: 'สีเทา-MJ337-29' },
+    { sku: '337-31', shortCode: '337-31', aliases: ['337-31', 'mj337-31', 'ฮอลแลนด์น้ำเงิน', 'น้ำเงินฮอลแลนด์'], color: 'น้ำเงิน', group: 'Hollan', price: 53, stockName: 'สีน้ำเงิน-MJ337-31' },
+    { sku: '736B-01', shortCode: '736-01', aliases: ['736b-01', '736-01', 'pkd 739b-01', 'นาโนน้ำตาลทอง'], color: 'ครีม (น้ำตาลทอง)', group: 'นาโน', price: 54, stockName: 'สีน้ำตาลทอง-736b-01' },
+    { sku: '736B-02', shortCode: '736-02', aliases: ['736b-02', '736-02', '736b-0', 'pkd 739b-02', 'นาโนเทาเข้ม', 'เทาเข้ม'], color: 'เทาเข้ม', group: 'นาโน', price: 54, stockName: 'สีเทาเข้ม-736b-02' },
+    { sku: '736B-04', shortCode: '736-04', aliases: ['736b-04', '736-04', 'mj350-9', '350-09', 'ฟ้าเทา'], color: 'ฟ้าเทา', group: 'นาโน', price: 54, stockName: 'สีฟ้าเทา-736b-04' }
   ];
 
   function createEmptyRow(fab) {
     return {
       sku: fab.sku,
+      shortCode: fab.shortCode || fab.sku,
       color: fab.color,
       group: fab.group,
       price: fab.price,
@@ -1412,66 +1413,426 @@
 
     // Helper: Match a string header or cell to a ROUTINE_FABRICS entry
     matchFabricFromText(rawText) {
-      if (!rawText) return null;
+      if (rawText === null || rawText === undefined) return null;
       const s = String(rawText).trim().toLowerCase();
       if (!s) return null;
-      // 1. Exact or substring SKU match
+
+      // 1. Check explicit aliases & SKU / shortCode substrings first (most specific)
       for (const f of ROUTINE_FABRICS) {
         if (s === f.sku.toLowerCase() || s.includes(f.sku.toLowerCase())) return f;
+        if (f.shortCode && (s === f.shortCode.toLowerCase() || s.includes(f.shortCode.toLowerCase()))) return f;
+        if (Array.isArray(f.aliases)) {
+          for (const al of f.aliases) {
+            if (s === al || s.includes(al)) return f;
+          }
+        }
       }
-      // 2. Shortcode match (e.g., 337-29, 337-07, 736b-04, 358-1a, c-06)
-      for (const f of ROUTINE_FABRICS) {
-        const sc = f.shortCode.toLowerCase();
-        if (s === sc || s.includes(sc)) return f;
+
+      // 2. Exact color column headers (used in "แยกPre-Order ตัด พ.ย" row 1: ขาว, ครีม, น้ำตาล, ชา, ดำ, เทา, มอคค่า)
+      const exactColorMap = {
+        'ขาว': 'PQ002C-06',
+        'ครีม': 'PQ002C-06',
+        'น้ำตาล': 'PQ002C-12',
+        'สีน้ำตาล': 'PQ002C-12',
+        'ชา': 'PQ002C-19',
+        'ดำ': 'PQ002C-17',
+        'สีดำ': 'PQ002C-17',
+        'เทา': 'PQ002C-46',
+        'สีเทา': 'PQ002C-46',
+        'มอคค่า': 'PQ002C-48',
+        'มอค่า': 'PQ002C-48'
+      };
+      if (exactColorMap[s]) {
+        return ROUTINE_FABRICS.find(x => x.sku === exactColorMap[s]) || null;
       }
-      // 3. Color name match
+
+      // 3. Exact color property match
       for (const f of ROUTINE_FABRICS) {
-        if (s === f.color.toLowerCase()) return f;
+        if (s === (f.color || '').toLowerCase()) return f;
       }
       return null;
     },
 
-    // Helper: Match a string header or cell to a model key + optional L/R side
+    // Helper: Match a string header or cell (including Shopee/TikTok Qs-... SKUs) to a model key + optional L/R side
     matchModelFromText(rawText) {
-      if (!rawText) return null;
+      if (rawText === null || rawText === undefined) return null;
       const s = String(rawText).trim().toLowerCase();
       if (!s) return null;
-      if (s.includes('l-mini') || s.includes('l mini') || s.includes('lmini') || s.includes('แอลมินิ')) {
-        if (s.includes('ขวา') || /\br\b|\(r\)/i.test(s)) return { key: 'lmini', side: 'R' };
-        if (s.includes('ซ้าย') || /\bl\b|\(l\)/i.test(s)) return { key: 'lmini', side: 'L' };
-        return { key: 'lmini', side: 'L' };
+
+      // Detect L/R side helper
+      const detectSide = (txt) => {
+        if (txt.includes('แอลขวา') || txt.includes('ขวา') || /\(r\)|\br\b/i.test(txt)) return 'R';
+        if (txt.includes('แอลซ้าย') || txt.includes('ซ้าย') || /\(l\)|\bl\b/i.test(txt)) return 'L';
+        return 'L';
+      };
+
+      // 1. L-Mini (including Shopee/TikTok Mnn(L/R), Mncf(L/R), Mnh(L/R), Mn(L/R), ตัวแอลมินิมอล)
+      if (
+        s.includes('l-mini') || s.includes('l mini') || s.includes('lmini') ||
+        s.includes('แอลมินิ') || s.includes('ตัวแอล') ||
+        /mnn\(|mncf\(|mnh\(|-mn\(/i.test(s)
+      ) {
+        return { key: 'lmini', side: detectSide(s) };
       }
-      if (s.includes('l ใหญ่') || s.includes('l-ใหญ่') || s.includes('lbig') || s.includes('แอลใหญ่')) return { key: 'lbig' };
-      if (s.includes('cs2') || s.includes('2pl') || s.includes('2 pl') || s.includes('2 ที่นั่ง')) return { key: 'cs2' };
-      if (s.includes('cs3') || s.includes('3pl') || s.includes('3 pl') || s.includes('3 ที่นั่ง')) return { key: 'cs3' };
-      if (s.includes('เฉพาะแขน') || s.includes('แขน new') || s.includes('แขน')) return { key: 'arm' };
-      if (s.includes('กระดก') || /\brs\b/i.test(s)) return { key: 'rs' };
-      if (s.includes('19 เม็ด') || s.includes('ln3') || s.includes('ln 3')) return { key: 'ln3' };
-      if (s.includes('5 เม็ด') || s.includes('ln5') || s.includes('ln 5') || /\bln\b/i.test(s)) return { key: 'ln5' };
-      if (s.includes('ปรับนอน') || /\brc\b/i.test(s) || /\bpn\b/i.test(s)) return { key: 'rc' };
+
+      // 2. L ใหญ่
+      if (s.includes('l ใหญ่') || s.includes('l-ใหญ่') || s.includes('lbig') || s.includes('แอลใหญ่')) {
+        return { key: 'lbig' };
+      }
+
+      // 3. RC / PN ปรับนอน (including Shopee/TikTok -rch-, -rcs-, -rcn-, -rcw-, -rcii-, โซฟาเบดปรับนอน)
+      if (
+        s.includes('ปรับนอน') || s.includes('pn lit') ||
+        /-rch|-rcs|-rcn|-rcw|-rcii/i.test(s) ||
+        /\brc\b|\bpn\b/i.test(s)
+      ) {
+        return { key: 'rc' };
+      }
+
+      // 4. RS หัวกระดก (including Shopee/TikTok -rss-, -rsh-, -rsn-, -rsw-, -rsii-, โซฟาเบดหัวกระดก)
+      if (
+        s.includes('หัวกระดก') || s.includes('กระดก') ||
+        /-rss|-rsh|-rsn|-rsw|-rsii/i.test(s) ||
+        /\brs\b/i.test(s)
+      ) {
+        return { key: 'rs' };
+      }
+
+      // 5. LN3 กระดุม 19 เม็ด / กระดุมวางแก้ว (including Shopee/TikTok -ln3-)
+      if (
+        s.includes('19 เม็ด') || s.includes('กระดุมวางแก้ว') ||
+        s.includes('ln3') || s.includes('ln 3')
+      ) {
+        return { key: 'ln3' };
+      }
+
+      // 6. LN5 กระดุม 5 เม็ด / เบาะกระดุมเล็ก LZ (including Shopee/TikTok -lz-, -ln5-)
+      if (
+        s.includes('5 เม็ด') || s.includes('กระดุมเล็ก') ||
+        s.includes('-lz-') || s.includes('ln5') || s.includes('ln 5') || /\bln\b/i.test(s)
+      ) {
+        return { key: 'ln5' };
+      }
+
+      // 7. CS2 / BS2 (2 ที่นั่ง)
+      if (
+        s.includes('cs2') || s.includes('2pl') || s.includes('2 pl') || s.includes('2ll') ||
+        s.includes('bs2') || s.includes('2ที่นั่ง') || s.includes('2 ที่นั่ง')
+      ) {
+        return { key: 'cs2' };
+      }
+
+      // 8. CS3 / BS3 / LU3 (3 ที่นั่ง)
+      if (
+        s.includes('cs3') || s.includes('3pl') || s.includes('3 pl') || s.includes('3ll') ||
+        s.includes('bs3') || s.includes('lu3') || s.includes('3ที่นั่ง') || s.includes('3 ที่นั่ง')
+      ) {
+        return { key: 'cs3' };
+      }
+
+      // 9. เฉพาะแขน (only when not part of ท้าวแขน / มีแขน)
+      if (
+        s.includes('เฉพาะแขน') || s.includes('แขน new') ||
+        (s.includes('แขน') && !s.includes('ท้าวแขน') && !s.includes('มีแขน'))
+      ) {
+        return { key: 'arm' };
+      }
+
       return null;
     },
 
     getModelMeta(modelKey) {
       const m = ROUTINE_MODELS.find(x => x.key === modelKey) || ROUTINE_MODELS[0];
       const labelMap = {
-        cs2: 'CS2 / 2 PL (3.20 หลา)',
-        cs3: 'CS3 / 3 PL (4.33 หลา)',
+        cs2: 'CS2 / BS2 2 ที่นั่ง (3.20 หลา)',
+        cs3: 'CS3 / BS3 / LU3 3 ที่นั่ง (4.33 หลา)',
         arm: 'เฉพาะแขน New (1.93 หลา)',
         rs: 'RS หัวกระดก (6.26 หลา)',
         ln3: 'LN3 กระดุม 19 เม็ด (6.21 หลา)',
-        ln5: 'LN กระดุม 5 เม็ด (6.17 หลา)',
-        rc: 'RC/PN ปรับนอน (6.65 หลา)',
-        lmini: 'L-Mini แอลมินิ (8.97 หลา)',
+        ln5: 'LN5 / LZ กระดุม 5 เม็ด (6.17 หลา)',
+        rc: 'RC / PN ปรับนอน (6.65 หลา)',
+        lmini: 'L-Mini แอลมินิมอล (8.97 หลา)',
         lbig: 'L ใหญ่ (11.00 หลา)'
       };
       return {
         modelKey: m.key,
-        modelLabel: labelMap[m.key] || `${m.label} (${m.yards} หลา)`,
-        yardsPerUnit: m.yards,
-        legsPerUnit: m.legs,
-        gearPerUnit: m.gear
+        modelLabel: labelMap[m.key] || `${m.label} (${m.yardsPerUnit || m.yards} หลา)`,
+        yardsPerUnit: Number(m.yardsPerUnit || m.yards || 4.33),
+        legsPerUnit: Number(m.legs !== undefined ? m.legs : 6),
+        gearPerUnit: Number(m.gear !== undefined ? m.gear : 0)
       };
+    },
+
+    // Parse CSV text into 2D array of rows (handles quoted fields with commas cleanly)
+    parseCsvTextToRows(text) {
+      const rows = [];
+      const lines = String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const cells = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              cur += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === ',' && !inQuotes) {
+            cells.push(cur.trim());
+            cur = '';
+          } else {
+            cur += ch;
+          }
+        }
+        cells.push(cur.trim());
+        rows.push(cells);
+      }
+      return rows;
+    },
+
+    // Parse a 2D array of rows from one sheet/CSV into aggByModel and return total units parsed in this sheet
+    parseSheetRowsIntoAgg(rows, aggByModel) {
+      if (!rows || rows.length < 1) return 0;
+      let sheetUnits = 0;
+
+      const addItem = (modelKey, sku, qty, side) => {
+        const num = Number(qty || 0);
+        if (!modelKey || !sku || isNaN(num) || num <= 0) return;
+        if (!aggByModel[modelKey]) {
+          aggByModel[modelKey] = { colorBreakdown: {}, lminiLR: {} };
+        }
+        aggByModel[modelKey].colorBreakdown[sku] = (aggByModel[modelKey].colorBreakdown[sku] || 0) + num;
+        if (modelKey === 'lmini') {
+          if (!aggByModel[modelKey].lminiLR[sku]) aggByModel[modelKey].lminiLR[sku] = { L: 0, R: 0 };
+          if (side === 'R') aggByModel[modelKey].lminiLR[sku].R += num;
+          else aggByModel[modelKey].lminiLR[sku].L += num;
+        }
+        sheetUnits += num;
+      };
+
+      // -------------------------------------------------------------------
+      // 1. Check if this sheet is a Shopee / TikTok / E-Commerce Order List
+      //    (contains "Qs-" SKUs or "หมายเลขคำสั่งซื้อ" / "เลขอ้างอิง SKU")
+      // -------------------------------------------------------------------
+      let ecomRowCount = 0;
+      for (let r = 0; r < Math.min(25, rows.length); r++) {
+        const lineStr = (rows[r] || []).join(' ');
+        if (/qs-|หมายเลขคำสั่งซื้อ|เลขอ้างอิง sku|สินค้าพรีออเดอร์/i.test(lineStr)) {
+          ecomRowCount++;
+        }
+      }
+
+      if (ecomRowCount >= 1) {
+        for (let r = 0; r < rows.length; r++) {
+          const row = rows[r] || [];
+          if (row.length < 2) continue;
+          const firstCell = String(row[0] || '').trim();
+          if (firstCell.includes('หมายเลขคำสั่งซื้อ') || firstCell.toLowerCase() === 'order id') continue;
+
+          // Find which cell holds the SKU (e.g. Col 3 in Shopee, Col 1 in TikTok)
+          let skuCol = -1;
+          for (let c = 0; c < row.length; c++) {
+            const cellStr = String(row[c] || '').trim();
+            if (/^qs-/i.test(cellStr) || (this.matchModelFromText(cellStr) && this.matchFabricFromText(cellStr))) {
+              skuCol = c;
+              break;
+            }
+          }
+          if (skuCol < 0) continue;
+
+          const skuText = String(row[skuCol] || '');
+          const optText = String(row[skuCol + 1] || '');
+          const combinedText = `${skuText} ${optText}`;
+
+          const mInfo = this.matchModelFromText(combinedText);
+          const fab = this.matchFabricFromText(combinedText) || this.matchFabricFromText(skuText) || this.matchFabricFromText(optText);
+          if (!mInfo || !fab) continue;
+
+          // Extract quantity:
+          // In Shopee: row[3]=SKU, row[4]=ชื่อตัวเลือก, row[5]=จำนวน
+          // In TikTok: row[1]=SKU, row[2]=ชื่อตัวเลือก, row[3]=จำนวน
+          let qty = 0;
+          const candidateCols = [skuCol + 2, skuCol + 1];
+          for (const cIdx of candidateCols) {
+            if (cIdx < row.length) {
+              const rawCell = String(row[cIdx] ?? '').trim();
+              if (/^\d+(\.\d+)?$/.test(rawCell)) {
+                const v = Number(rawCell);
+                if (v > 0 && v <= 500) {
+                  qty = v;
+                  break;
+                }
+              }
+            }
+          }
+          if (qty <= 0) {
+            // Fallback: find any cell after skuCol that is a pure small number (not a date or tracking number)
+            for (let c = skuCol + 1; c < row.length; c++) {
+              const rawCell = String(row[c] ?? '').trim();
+              if (/^\d+$/.test(rawCell)) {
+                const v = Number(rawCell);
+                if (v > 0 && v <= 500) {
+                  qty = v;
+                  break;
+                }
+              }
+            }
+          }
+          if (qty <= 0) qty = 1;
+
+          addItem(mInfo.key, fab.sku, qty, mInfo.side);
+        }
+        if (sheetUnits > 0) return sheetUnits;
+      }
+
+      // -------------------------------------------------------------------
+      // 2. Check for Header Row (Matrix or Transposed Matrix)
+      // -------------------------------------------------------------------
+      let headerRowIdx = -1;
+      let colModels = {};  // colIdx -> { key, side }
+      let colFabrics = {}; // colIdx -> fab
+
+      for (let r = 0; r < Math.min(12, rows.length); r++) {
+        const rowCells = rows[r] || [];
+        const tempModels = {};
+        const tempFabrics = {};
+        rowCells.forEach((cellVal, cIdx) => {
+          const sCell = String(cellVal || '').trim();
+          if (!sCell) return;
+          // Ignore summary/yardage/roll columns when matching models
+          if (
+            !sCell.includes('รวม') &&
+            !sCell.includes('ม้วน') &&
+            !sCell.includes('ส่งไม้') &&
+            !sCell.includes('ราคา') &&
+            !sCell.includes('คงเหลือ') &&
+            !sCell.includes('หมายเหตุ')
+          ) {
+            const mMatch = this.matchModelFromText(sCell);
+            if (mMatch) tempModels[cIdx] = mMatch;
+          }
+          const fMatch = this.matchFabricFromText(sCell);
+          if (fMatch) tempFabrics[cIdx] = fMatch;
+        });
+
+        if (Object.keys(tempModels).length >= 2) {
+          headerRowIdx = r;
+          colModels = tempModels;
+          // Check next 2 rows for L-Mini ซ้าย/ขวา or "รวมหลา" subheaders
+          for (let subR = r + 1; subR <= Math.min(r + 2, rows.length - 1); subR++) {
+            (rows[subR] || []).forEach((subCell, cIdx) => {
+              const sText = String(subCell || '').trim().toLowerCase();
+              if (!sText) return;
+              if (sText.includes('รวมหลา') || sText === 'รวม' || sText.includes('ม้วน')) {
+                delete colModels[cIdx];
+              } else if (sText.includes('ขวา') || sText === 'r' || sText.includes('(r)')) {
+                colModels[cIdx] = { key: 'lmini', side: 'R' };
+              } else if (sText.includes('ซ้าย') || sText === 'l' || sText.includes('(l)')) {
+                colModels[cIdx] = { key: 'lmini', side: 'L' };
+              }
+            });
+          }
+          break;
+        }
+
+        if (Object.keys(tempFabrics).length >= 4) {
+          headerRowIdx = r;
+          colFabrics = tempFabrics;
+          break;
+        }
+      }
+
+      // CASE A: Standard Cutting / Outsource / Pre-Order Template Matrix (Rows = Fabrics, Cols = Models)
+      if (headerRowIdx >= 0 && Object.keys(colModels).length >= 2) {
+        for (let r = headerRowIdx + 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const firstCellsText = row.slice(0, 4).join(' ');
+          if (firstCellsText.includes('รวมจำนวน') || firstCellsText.includes('ราคาค่าแรง') || firstCellsText.includes('ราคาตัด')) break;
+
+          let fab = null;
+          for (let c = 0; c < Math.min(4, row.length); c++) {
+            const cellStr = String(row[c] || '').trim();
+            if (!cellStr || cellStr === 'PVC หนัง' || cellStr === 'ลูกฟูก' || cellStr === 'Hollan' || cellStr === 'นาโน') continue;
+            fab = this.matchFabricFromText(cellStr);
+            if (fab) break;
+          }
+          if (!fab) continue;
+
+          Object.entries(colModels).forEach(([cIdxStr, mInfo]) => {
+            const cIdx = Number(cIdxStr);
+            const rawVal = String(row[cIdx] ?? '').trim();
+            if (!rawVal) return;
+            const qty = parseFloat(rawVal.replace(/,/g, ''));
+            if (!isNaN(qty) && qty > 0 && qty < 10000) {
+              addItem(mInfo.key, fab.sku, qty, mInfo.side);
+            }
+          });
+        }
+        return sheetUnits;
+      }
+
+      // CASE B: Transposed / Sectioned Pre-Order Sheet (like "แยกPre-Order ตัด พ.ย" where Row 1 = Colors, and sections below = "รุ่น กระดุม 19 เม็ด", daily rows, etc.)
+      if (headerRowIdx >= 0 && Object.keys(colFabrics).length >= 4) {
+        let currentSectionModel = null;
+        for (let r = headerRowIdx + 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const firstCell = String(row[0] ?? '').trim();
+          const secondCell = String(row[1] ?? '').trim();
+
+          // Skip summary/formula rows in "แยกPre-Order" so we don't double-count daily rows + total row
+          if (
+            firstCell === 'รวม' ||
+            firstCell.includes('ใช้หลา') ||
+            firstCell.includes('การสั่ง/ม้วน') ||
+            firstCell.includes('รวมยอด')
+          ) {
+            continue;
+          }
+
+          // Check if this row starts a new model section (e.g., "รุ่น กระดุม 19 เม็ด", "รุ่น ปรับนอน RC")
+          const rowTextJoined = row.slice(0, 8).join(' ');
+          const isSectionHeader = firstCell.startsWith('รุ่น') || (rowTextJoined.includes('ใช้') && rowTextJoined.includes('หลา'));
+          const rowModelMatch = this.matchModelFromText(firstCell) || (firstCell.startsWith('รุ่น') ? this.matchModelFromText(`${firstCell} ${secondCell}`) : null);
+          if (rowModelMatch) {
+            currentSectionModel = rowModelMatch;
+            if (!isSectionHeader) {
+              // Single-row transposed matrix (row is the model data itself)
+              Object.entries(colFabrics).forEach(([cIdxStr, fab]) => {
+                const cIdx = Number(cIdxStr);
+                const rawVal = String(row[cIdx] ?? '').trim();
+                if (/^\d+(\.\d+)?$/.test(rawVal)) {
+                  const qty = Number(rawVal);
+                  if (qty > 0 && qty < 5000) {
+                    addItem(currentSectionModel.key, fab.sku, qty, currentSectionModel.side);
+                  }
+                }
+              });
+            }
+            continue;
+          }
+
+          // Otherwise, if we are inside a model section (e.g., daily rows 1/11, 2/11, ...), sum the fabric columns
+          if (currentSectionModel) {
+            Object.entries(colFabrics).forEach(([cIdxStr, fab]) => {
+              const cIdx = Number(cIdxStr);
+              const rawVal = String(row[cIdx] ?? '').trim();
+              if (/^\d+(\.\d+)?$/.test(rawVal)) {
+                const qty = Number(rawVal);
+                if (qty > 0 && qty < 5000) {
+                  addItem(currentSectionModel.key, fab.sku, qty, currentSectionModel.side);
+                }
+              }
+            });
+          }
+        }
+        return sheetUnits;
+      }
+
+      return sheetUnits;
     },
 
     // Handle uploaded or dropped Excel/CSV files in Tab 3
@@ -1487,160 +1848,72 @@
       const uploadMode = document.getElementById('preorder-upload-mode')?.value || 'REPLACE';
       const statusEl = document.getElementById('preorder-upload-status');
 
-      // Aggregated map: modelKey -> { colorBreakdown: { sku: qty }, lminiLR: { sku: { L, R } } }
       const aggByModel = {};
-      const addItem = (modelKey, sku, qty, side) => {
-        const num = Number(qty || 0);
-        if (!modelKey || !sku || isNaN(num) || num <= 0) return;
-        if (!aggByModel[modelKey]) {
-          aggByModel[modelKey] = { colorBreakdown: {}, lminiLR: {} };
-        }
-        aggByModel[modelKey].colorBreakdown[sku] = (aggByModel[modelKey].colorBreakdown[sku] || 0) + num;
-        if (modelKey === 'lmini') {
-          if (!aggByModel[modelKey].lminiLR[sku]) aggByModel[modelKey].lminiLR[sku] = { L: 0, R: 0 };
-          if (side === 'R') aggByModel[modelKey].lminiLR[sku].R += num;
-          else aggByModel[modelKey].lminiLR[sku].L += num;
-        }
-      };
-
       const files = Array.from(fileList);
       let processedFiles = 0;
       let totalParsedUnits = 0;
+      const importedSheetNames = [];
 
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
             const data = new Uint8Array(e.target.result);
-            const wb = XLSX.read(data, { type: 'array' });
+            const isZip = data.length >= 2 && data[0] === 0x50 && data[1] === 0x4B;
+            const isOle = data.length >= 2 && data[0] === 0xD0 && data[1] === 0xCF;
+            const isCsvOrTxt = /\.(csv|txt)$/i.test(file.name || '') || (!isZip && !isOle);
 
-            wb.SheetNames.forEach(sheetName => {
-              const sheet = wb.Sheets[sheetName];
-              const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-              if (!rows || rows.length < 2) return;
+            if (isCsvOrTxt) {
+              // Decode UTF-8 directly (with Windows-874 Thai fallback) so Thai characters in CSV are never garbled
+              let textContent = new TextDecoder('utf-8').decode(data);
+              if (textContent.includes('\uFFFD')) {
+                try {
+                  textContent = new TextDecoder('windows-874').decode(data);
+                } catch (_) {}
+              }
+              const csvRows = this.parseCsvTextToRows(textContent);
+              const u = this.parseSheetRowsIntoAgg(csvRows, aggByModel);
+              if (u > 0) {
+                totalParsedUnits += u;
+                importedSheetNames.push(file.name);
+              }
+            } else {
+              const wb = XLSX.read(data, { type: 'array' });
+              const sheetNames = wb.SheetNames || [];
 
-              // Find header row (first 10 rows) that has either multiple model names OR multiple fabric SKUs
-              let headerRowIdx = -1;
-              let colModels = {}; // colIdx -> { key, side }
-              let colFabrics = {}; // colIdx -> fab
-
-              for (let r = 0; r < Math.min(12, rows.length); r++) {
-                const rowCells = rows[r] || [];
-                const tempModels = {};
-                const tempFabrics = {};
-                rowCells.forEach((cellVal, cIdx) => {
-                  const mMatch = this.matchModelFromText(cellVal);
-                  // Ignore "รวมหลา" columns when importing unit counts
-                  if (mMatch && !String(cellVal).includes('รวมหลา')) {
-                    tempModels[cIdx] = mMatch;
-                  }
-                  const fMatch = this.matchFabricFromText(cellVal);
-                  if (fMatch) {
-                    tempFabrics[cIdx] = fMatch;
-                  }
-                });
-
-                // Check next row too in case of 2-row merged header (e.g. L-Mini ซ้าย / ขวา on row r+1)
-                if (Object.keys(tempModels).length >= 2) {
-                  headerRowIdx = r;
-                  colModels = tempModels;
-                  if (rows[r + 1]) {
-                    rows[r + 1].forEach((subCell, cIdx) => {
-                      const sText = String(subCell || '').trim().toLowerCase();
-                      if (sText.includes('รวมหลา')) {
-                        delete colModels[cIdx];
-                      } else if (sText.includes('ขวา') || sText === 'r' || sText.includes('(r)')) {
-                        colModels[cIdx] = { key: 'lmini', side: 'R' };
-                      } else if (sText.includes('ซ้าย') || sText === 'l' || sText.includes('(l)')) {
-                        colModels[cIdx] = { key: 'lmini', side: 'L' };
-                      }
-                    });
-                  }
-                  break;
-                }
-                if (Object.keys(tempFabrics).length >= 3) {
-                  headerRowIdx = r;
-                  colFabrics = tempFabrics;
-                  break;
+              // If multi-sheet workbook (like "ใบเบิกผ้า ช่างตัด 69.xlsx" with 40 sheets):
+              // Prioritize active Pre-Order sheet or latest round sheet rather than summing 40 historical sheets
+              let targetSheets = sheetNames;
+              if (sheetNames.length > 3) {
+                const preOrderSheet = sheetNames.find(sn => /แยก\s*pre-?order/i.test(sn));
+                const roundSheets = sheetNames.filter(sn => !sn.includes('ฟอร์ม') && !sn.includes('สูตรคุณบุญ'));
+                if (preOrderSheet) {
+                  targetSheets = [preOrderSheet, ...roundSheets];
+                } else {
+                  targetSheets = roundSheets.length > 0 ? roundSheets : sheetNames;
                 }
               }
 
-              // CASE 1: Matrix where Rows = Fabric SKUs, Columns = Models (like ใบเบิกผ้า / ใบสั่งตัดนอก / เทมเพรส Pre-Order)
-              if (headerRowIdx >= 0 && Object.keys(colModels).length >= 2) {
-                for (let r = headerRowIdx + 1; r < rows.length; r++) {
-                  const row = rows[r] || [];
-                  const firstCellsText = row.slice(0, 4).join(' ');
-                  if (firstCellsText.includes('รวมจำนวน') || firstCellsText.includes('ราคาค่าแรง')) break;
-                  let fab = null;
-                  for (let c = 0; c < Math.min(4, row.length); c++) {
-                    fab = this.matchFabricFromText(row[c]);
-                    if (fab) break;
-                  }
-                  if (!fab) continue;
-
-                  Object.entries(colModels).forEach(([cIdxStr, mInfo]) => {
-                    const cIdx = Number(cIdxStr);
-                    const rawVal = row[cIdx];
-                    const qty = parseFloat(String(rawVal || '').replace(/[^0-9.-]/g, ''));
-                    if (!isNaN(qty) && qty > 0) {
-                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
-                      totalParsedUnits += qty;
-                    }
-                  });
+              for (const sheetName of targetSheets) {
+                const sheet = wb.Sheets[sheetName];
+                if (!sheet) continue;
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                const u = this.parseSheetRowsIntoAgg(rows, aggByModel);
+                if (u > 0) {
+                  totalParsedUnits += u;
+                  importedSheetNames.push(`${file.name} [${sheetName}]`);
+                  // If this is a multi-sheet historical workbook (>3 sheets), stop after importing the first valid main sheet
+                  if (sheetNames.length > 3) break;
                 }
               }
-              // CASE 2: Transposed Matrix where Rows = Models, Columns = Fabric SKUs
-              else if (headerRowIdx >= 0 && Object.keys(colFabrics).length >= 3) {
-                for (let r = headerRowIdx + 1; r < rows.length; r++) {
-                  const row = rows[r] || [];
-                  let mInfo = null;
-                  for (let c = 0; c < Math.min(4, row.length); c++) {
-                    mInfo = this.matchModelFromText(row[c]);
-                    if (mInfo) break;
-                  }
-                  if (!mInfo) continue;
-
-                  Object.entries(colFabrics).forEach(([cIdxStr, fab]) => {
-                    const cIdx = Number(cIdxStr);
-                    const qty = parseFloat(String(row[cIdx] || '').replace(/[^0-9.-]/g, ''));
-                    if (!isNaN(qty) && qty > 0) {
-                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
-                      totalParsedUnits += qty;
-                    }
-                  });
-                }
-              }
-              // CASE 3: Flat Order List (each row has Model + Fabric SKU/Color + Qty)
-              else {
-                for (let r = 0; r < rows.length; r++) {
-                  const row = rows[r] || [];
-                  const rowText = row.join(' ');
-                  const mInfo = this.matchModelFromText(rowText);
-                  const fab = this.matchFabricFromText(rowText);
-                  if (mInfo && fab) {
-                    // Find last numeric column as quantity
-                    let qty = 0;
-                    for (let c = row.length - 1; c >= 0; c--) {
-                      const v = parseFloat(String(row[c] || '').replace(/[^0-9.-]/g, ''));
-                      if (!isNaN(v) && v > 0 && v < 5000) {
-                        qty = v;
-                        break;
-                      }
-                    }
-                    if (qty > 0) {
-                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
-                      totalParsedUnits += qty;
-                    }
-                  }
-                }
-              }
-            });
+            }
           } catch (err) {
             console.error('PreOrder upload parse error:', err);
           } finally {
             processedFiles++;
             if (processedFiles === files.length) {
-              this.finalizePreOrderUpload(aggByModel, dateLabel, uploadMode, totalParsedUnits, files.map(f => f.name).join(', '), statusEl);
+              const labelNames = importedSheetNames.length > 0 ? importedSheetNames.join(', ') : files.map(f => f.name).join(', ');
+              this.finalizePreOrderUpload(aggByModel, dateLabel, uploadMode, totalParsedUnits, labelNames, statusEl);
             }
           }
         };
