@@ -338,42 +338,53 @@
         <div id="routine-outsource-view-wrap" class="hidden space-y-3">
           <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h3 class="text-sm font-bold text-fuchsia-950">🖨️ ใบสั่งผลิตส่งช่างตัดนอก (รูปแบบชีต "สั่งตัดนอก" • แยก L-mini ซ้าย / ขวา)</h3>
-              <p class="text-xs text-fuchsia-700">ตัดคอลัมน์ราคาผ้าออกเพื่อให้พร้อมพิมพ์หรือแคปหน้าจอส่งให้ร้านตัดดอนเมือง / ช่าง P'บุญ ได้ทันที</p>
+              <h3 class="text-sm font-bold text-fuchsia-950">🖨️ ใบสั่งผลิตส่งช่างตัดนอก (รูปแบบชีต "สั่งตัดนอก" • ซิงค์ยอดสั่งตัดกับมุมมองที่ 1 แบบ 2 ทางอัตโนมัติ)</h3>
+              <p class="text-xs text-fuchsia-700">แก้ไขยอดสั่งตัดในตารางนี้หรือในมุมมองที่ 1 ได้ทันที ข้อมูลซิงค์หากันอัตโนมัติ 100% พร้อมดาวน์โหลดเป็น Excel หน้าตาเหมือนในระบบ</p>
             </div>
-            <button onclick="window.print()" type="button" class="px-3.5 py-2 rounded-xl bg-fuchsia-700 hover:bg-fuchsia-800 text-white text-xs font-bold shadow-xs">
-              🖨️ พิมพ์ใบสั่งตัดนอก
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btn-outsource-autofill-rolls" type="button" class="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition">
+                ⚡ ดึงจำนวนม้วนตามสูตรใส่ช่องส่งไม้
+              </button>
+              <button id="btn-outsource-export-excel" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition">
+                📥 ดาวน์โหลด Excel (ใบเบิกผ้า + ใบสั่งตัดนอก)
+              </button>
+              <button onclick="window.print()" type="button" class="px-3.5 py-2 rounded-xl bg-fuchsia-700 hover:bg-fuchsia-800 text-white text-xs font-bold shadow-xs">
+                🖨️ พิมพ์ใบสั่งตัดนอก
+              </button>
+            </div>
           </div>
 
-          <div class="overflow-x-auto custom-scrollbar border border-slate-300 rounded-xl">
+          <div class="overflow-x-auto custom-scrollbar border-2 border-slate-300 rounded-xl shadow-inner">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-900 text-white text-[11px] uppercase">
-                  <th rowspan="2" class="py-2.5 px-3">กลุ่มผ้า</th>
-                  <th rowspan="2" class="py-2.5 px-3">เบอร์สี SKU</th>
-                  <th rowspan="2" class="py-2.5 px-3">สี</th>
-                  <th rowspan="2" class="py-2.5 px-2 text-center bg-amber-900">จำนวนการส่งไม้<br>(ม้วน / ใช้ผ้าที่มี)</th>
-                  <th class="py-1.5 px-2 text-center">2 PL</th>
-                  <th class="py-1.5 px-2 text-center">3 PL</th>
-                  <th class="py-1.5 px-2 text-center">แขน New</th>
-                  <th class="py-1.5 px-2 text-center">กระดก</th>
-                  <th class="py-1.5 px-2 text-center">กระดุม 19 เม็ด</th>
-                  <th class="py-1.5 px-2 text-center">กระดุม 5 เม็ด</th>
-                  <th class="py-1.5 px-2 text-center">ปรับนอน</th>
-                  <th colspan="2" class="py-1.5 px-2 text-center bg-fuchsia-950 border-x border-fuchsia-700">L-mini (Order สั่งผลิต)</th>
+                  <th rowspan="2" class="py-2.5 px-3 border-r border-slate-700">กลุ่มผ้า</th>
+                  <th rowspan="2" class="py-2.5 px-3 border-r border-slate-700">เบอร์สี SKU</th>
+                  <th rowspan="2" class="py-2.5 px-3 border-r border-slate-700">สี</th>
+                  <th rowspan="2" class="py-2.5 px-2 text-center bg-amber-900 border-r border-amber-700">จำนวนการส่งไม้<br><span class="text-[9px] text-amber-200">(ม้วน / ใช้ผ้าที่มี)</span></th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">2 PL</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">3 PL</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">แขน New</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">กระดก</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">กระดุม 19 เม็ด</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-900/80 border-l border-slate-700">กระดุม 5 เม็ด</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-950 border-l border-slate-700">ปรับนอน</th>
+                  <th colspan="2" class="py-1.5 px-2 text-center bg-fuchsia-950 border-x border-fuchsia-700">L-mini (Order ตัดเพิ่ม)</th>
+                  <th class="py-1.5 px-2 text-center bg-indigo-900/80 border-r border-slate-700">L ใหญ่</th>
+                  <th rowspan="2" class="py-2.5 px-2 text-center bg-emerald-950 border-r border-slate-700">รวมชุด<br>สั่งตัด</th>
                   <th rowspan="2" class="py-2.5 px-3">หมายเหตุสั่งช่างนอก</th>
                 </tr>
-                <tr class="bg-slate-800 text-slate-300 text-[10px]">
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center">Order</th>
-                  <th class="py-1 px-2 text-center bg-fuchsia-900 text-fuchsia-200">ซ้าย (L)</th>
-                  <th class="py-1 px-2 text-center bg-indigo-900 text-indigo-200">ขวา (R)</th>
+                <tr class="bg-slate-800 text-slate-300 text-[10px] border-b border-slate-600">
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center border-l border-slate-700">Order</th>
+                  <th class="py-1 px-2 text-center bg-fuchsia-900 text-fuchsia-200 border-l border-fuchsia-700">ซ้าย (L)</th>
+                  <th class="py-1 px-2 text-center bg-indigo-900 text-indigo-200 border-r border-fuchsia-700">ขวา (R)</th>
+                  <th class="py-1 px-2 text-center border-r border-slate-700">Order</th>
                 </tr>
               </thead>
               <tbody id="admin-outsource-sheet-tbody"></tbody>
@@ -543,16 +554,117 @@
     <!-- NEW TAB 3: PRE-ORDER DAILY (LEGS/GEARS) + SPARE PARTS + BILLING     -->
     <!-- =================================================================== -->
     <section id="tab-preorder-billing" class="tab-pane hidden space-y-6">
-      <!-- Part 3.1: Pre-Order Summary + Legs & Gears Calculator -->
-      <div class="bg-white rounded-2xl p-5 border border-indigo-200 shadow-xs space-y-4">
-        <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 mb-1">
-            📊 ซิงค์จากชีต "แยกPre-Order ตัด พ.ย / ต.ค"
+      <!-- Part 3.1: Pre-Order Summary + Drag & Drop Upload + Legs & Gears Calculator -->
+      <div class="bg-white rounded-2xl p-5 border-2 border-indigo-200 shadow-xs space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 mb-1">
+              📊 ระบบอัปโหลดและคำนวณรีพอร์ต #Pre-Order (อัปโหลด / ลากวางไฟล์ Excel หรือ CSV ได้เองทันที)
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">
+              ตารางสรุปรีพอร์ต #Pre-Order งานตัด TT-Shopee แยกตามรุ่นและสี พร้อมคำนวณหลา/ม้วน, ขาโซฟา 1" (ถุงละ 500) และเกียร์ปรับนอน (ลังละ 15)
+            </h2>
+            <p class="text-xs text-slate-500">
+              แอดมินสามารถลากไฟล์ออเดอร์ Excel / CSV มาวาง หรือคลิกอัปโหลดไฟล์เพื่อแยกสีแยกรุ่น คำนวณหลา/ม้วน ขาโซฟา และเกียร์ปรับนอนอัตโนมัติ (พร้อมส่งยอดเข้าแท็บ 1 ได้ทันที)
+            </p>
           </div>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900">
-            ตารางสรุปรีพอร์ต #Pre-Order งานตัด TT-Shopee แยกตามรุ่นและสี พร้อมคำนวณหลา/ม้วน, ขาโซฟา 1" (ถุงละ 500) และเกียร์ปรับนอน (ลังละ 15)
-          </h2>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-preorder-download-template" type="button" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold transition flex items-center gap-1.5">
+              📄 ดาวน์โหลดเทมเพลต Pre-Order (.xlsx)
+            </button>
+            <button id="btn-preorder-push-to-tab1" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="นำยอด Pre-Order ในตารางนี้ไปใส่ในตารางใบเบิกผ้า (แท็บ 1) และใบสั่งตัดนอกอัตโนมัติ">
+              ⚡ ส่งยอด Pre-Order เข้าใบเบิกผ้า (แท็บ 1)
+            </button>
+            <button id="btn-preorder-export-excel" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+              📥 ดาวน์โหลดรีพอร์ต Pre-Order (.xlsx)
+            </button>
+            <button id="btn-preorder-clear-all" type="button" class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+              🗑️ ล้างตาราง Pre-Order
+            </button>
+          </div>
         </div>
+
+        <!-- Drag & Drop Upload Box + Settings -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+            <div class="space-y-2.5">
+              <div class="text-xs font-bold text-slate-800">⚙️ ตั้งค่ารอบวันที่ & รูปแบบการนำเข้าออเดอร์</div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">ระบุช่วงวันที่ / ชื่อรอบ Pre-Order ที่อัปโหลด</label>
+                <input type="text" id="preorder-upload-date-label" value="14-21 พ.ย. 69 (รอบอัปโหลดใหม่)" placeholder="เช่น 14-21 พ.ย. 69 (รอบ 4)"
+                  class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-indigo-950">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">โหมดการอัปโหลด</label>
+                <select id="preorder-upload-mode" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                  <option value="REPLACE" selected>🔄 แทนที่ข้อมูล Pre-Order เดิม (แสดงเฉพาะไฟล์ที่อัปโหลดใหม่)</option>
+                  <option value="APPEND">➕ เพิ่มต่อท้ายตาราง Pre-Order เดิม</option>
+                </select>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-500 bg-white p-2.5 rounded-lg border border-slate-200">
+              💡 <strong>รองรับทั้ง 3 รูปแบบไฟล์:</strong> 1) เทมเพลตตารางแยกรุ่น×สี  2) ไฟล์ใบเบิกผ้า/สั่งตัดนอก  3) ไฟล์ออเดอร์ Shopee / TikTok (ที่มีชื่อรุ่น/SKU และจำนวน)
+            </div>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div id="preorder-dropzone" class="h-full min-h-[155px] border-2 border-dashed border-indigo-400 hover:border-indigo-600 bg-indigo-50/40 hover:bg-indigo-50/80 transition rounded-2xl p-5 flex flex-col items-center justify-center text-center cursor-pointer select-none">
+              <input type="file" id="preorder-file-input" accept=".xlsx,.xls,.csv" multiple class="hidden">
+              <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-md mb-2">
+                📂
+              </div>
+              <div class="text-sm font-extrabold text-indigo-950">
+                ลากไฟล์ออเดอร์ Pre-Order (.xlsx, .xls, .csv) มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์
+              </div>
+              <p class="text-xs text-indigo-700 mt-1">
+                ระบบจะแยกสี แยกรุ่นโซฟา คำนวณหลา/ม้วน ขาโซฟา 1" (÷500) และเกียร์ปรับนอน (÷15) ให้อัตโนมัติทันที
+              </p>
+              <span id="preorder-upload-status" class="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-white text-indigo-700 border border-indigo-200 shadow-2xs">
+                พร้อมรับไฟล์อัปโหลด
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Manual Add Row for Pre-Order -->
+        <form id="form-add-preorder-manual" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">เพิ่มรายการ Pre-Order ด้วยตัวเอง (รุ่นโซฟา)</label>
+            <select id="po-manual-model" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+              <option value="cs2">CS2 / 2PL - New (3.20 หลา | 6 ขา)</option>
+              <option value="cs3" selected>CS3 / 3PL / BS3 / LU3 (4.33 หลา | 6 ขา)</option>
+              <option value="arm">เฉพาะแขน New (1.93 หลา)</option>
+              <option value="rs">RS หัวกระดก (6.26 หลา | 6 ขา | 1 เกียร์)</option>
+              <option value="ln3">LN3 กระดุม 19 เม็ด (6.21 หลา | 6 ขา)</option>
+              <option value="ln5">LN กระดุม 5 เม็ด (6.17 หลา | 6 ขา)</option>
+              <option value="rc">PN ปรับนอน RC (6.65 หลา | 6 ขา | 1 เกียร์)</option>
+              <option value="lmini">L-Mini ซ้าย/ขวา (8.97 หลา | 8 ขา)</option>
+              <option value="lbig">L ใหญ่ (11.00 หลา | 10 ขา)</option>
+            </select>
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">เบอร์สีผ้า (SKU)</label>
+            <select id="po-manual-sku" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-indigo-900">
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">จำนวน (ตัว)</label>
+            <input type="number" id="po-manual-qty" min="1" value="10" required class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">ฝั่ง L-Mini (ถ้าเป็นรุ่น L)</label>
+            <select id="po-manual-lr" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+              <option value="NONE">ปกติ (ไม่แยกซ้าย/ขวา)</option>
+              <option value="L">ฝั่งซ้าย (L)</option>
+              <option value="R">ฝั่งขวา (R)</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <button type="submit" class="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow">
+              + เพิ่มเข้าตาราง Pre-Order
+            </button>
+          </div>
+        </form>
 
         <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
           <table class="w-full text-left border-collapse">
@@ -560,11 +672,12 @@
               <tr class="bg-slate-900 text-white text-[11px] uppercase">
                 <th class="py-2.5 px-3">รอบวันที่ Pre-Order</th>
                 <th class="py-2.5 px-3">รุ่นโซฟา</th>
-                <th class="py-2.5 px-3">แยกจำนวนตามเบอร์สีผ้า</th>
+                <th class="py-2.5 px-3">แยกจำนวนตามเบอร์สีผ้า (คลิกแก้ไขตัวเลขได้)</th>
                 <th class="py-2.5 px-3 text-center">รวม (ตัว)</th>
                 <th class="py-2.5 px-3 text-right">ใช้ผ้า (หลา / ม้วน)</th>
                 <th class="py-2.5 px-3 text-right bg-amber-900">ขาโซฟา 1" (6 ขา/ตัว)<br><span class="text-[10px] text-amber-200">แปลงเป็นถุง (÷500)</span></th>
                 <th class="py-2.5 px-3 text-right bg-emerald-900">เกียร์ปรับนอน (1 คู่/ตัว)<br><span class="text-[10px] text-emerald-200">แปลงเป็นลัง (÷15)</span></th>
+                <th class="py-2.5 px-2 text-center">จัดการ</th>
               </tr>
             </thead>
             <tbody id="preorder-daily-tbody"></tbody>
@@ -1130,7 +1243,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="xlsx.full.min.js"></script>
+  <script src="xlsx-style.min.js"></script>
   <script src="supabase.min.js"></script>
   <script src="master-bom-data.js"></script>
   <script src="sku-mapper.js"></script>

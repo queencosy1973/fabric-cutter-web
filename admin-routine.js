@@ -811,38 +811,66 @@
       });
     },
 
-    // Render Mode B: "ใบสั่งตัดนอก" (Outsource Production Order Sheet with L-Mini L/R Split)
+    // Render Mode B: "ใบสั่งตัดนอก" (Outsource Production Order Sheet with Full 2-Way Sync with View 1)
     renderOutsourceOrderTable(round, totals) {
       const tbody = document.getElementById('admin-outsource-sheet-tbody');
       const tfoot = document.getElementById('admin-outsource-sheet-tfoot');
       if (!tbody || !tfoot) return;
 
+      const stdModels = ['cs2', 'cs3', 'arm', 'rs', 'ln3', 'ln5', 'rc'];
+
       tbody.innerHTML = (round.rows || []).map((row, idx) => {
         const m = computeRowMetrics(row, round.formulaMode);
         const hasAny = m.totalUnits > 0 || row.orderRollsText || row.outsourceNote;
+        const groupColor =
+          row.group === 'PVC หนัง' ? 'bg-amber-50/40' :
+          row.group === 'ลูกฟูก' ? 'bg-emerald-50/40' :
+          row.group === 'Hollan' ? 'bg-sky-50/40' : 'bg-purple-50/40';
+
+        const stdCells = stdModels.map(key => {
+          const val = Number(row[key] || 0);
+          return `
+            <td class="py-1.5 px-1.5 text-center ${val > 0 ? 'bg-indigo-50/70' : ''}">
+              <input type="number" min="0" value="${val > 0 ? val : ''}" data-out-idx="${idx}" data-out-field="${key}"
+                placeholder="-"
+                class="w-12 px-1 py-0.5 text-center font-bold ${val > 0 ? 'text-indigo-900 border-indigo-400 bg-white shadow-2xs' : 'text-slate-500 border-slate-200 bg-slate-50/60'} border rounded text-xs focus:ring-1 focus:ring-indigo-500">
+            </td>
+          `;
+        }).join('');
+
+        const lminiLVal = Number(row.lminiL || 0);
+        const lminiRVal = Number(row.lminiR || 0);
+        const lbigVal = Number(row.lbig || 0);
+
         return `
-          <tr class="${hasAny ? 'bg-white hover:bg-fuchsia-50/30' : 'bg-slate-50/50 text-slate-400'} border-b border-slate-200 text-xs">
-            <td class="py-2 px-3 font-semibold">${row.group}</td>
-            <td class="py-2 px-3 font-bold text-slate-900">${row.sku}</td>
-            <td class="py-2 px-3 font-semibold text-slate-800">${row.color}</td>
-            <td class="py-1.5 px-2 text-center bg-amber-50/60">
+          <tr class="${hasAny ? 'bg-white hover:bg-fuchsia-50/30' : groupColor} border-b border-slate-200 text-xs transition-colors">
+            <td class="py-2 px-3 font-semibold text-slate-700 whitespace-nowrap">${row.group}</td>
+            <td class="py-2 px-3 font-bold text-slate-900 whitespace-nowrap">${row.sku}</td>
+            <td class="py-2 px-3 font-semibold text-slate-800 whitespace-nowrap">${row.color}</td>
+            <td class="py-1.5 px-2 text-center bg-amber-50/60 border-x border-amber-200">
               <input type="text" value="${row.orderRollsText || ''}" data-out-idx="${idx}" data-out-field="orderRollsText"
-                placeholder="-" class="w-28 px-2 py-1 text-center font-bold text-amber-900 border border-amber-300 rounded bg-white text-xs">
+                placeholder="${m.calcRolls > 0 ? `สูตร ${this.fmt(m.calcRolls, 1)} ม้วน` : '-'}"
+                class="w-32 px-2 py-1 text-center font-bold text-amber-900 border border-amber-300 rounded bg-white text-xs">
+              ${m.calcRolls > 0 ? `<div class="text-[10px] text-amber-700 font-semibold mt-0.5">คำนวณ: ${this.fmt(m.calcRolls, 1)} ม้วน (${this.fmt(m.totalUsedYards, 1)} หลา)</div>` : ''}
             </td>
-            <td class="py-2 px-2 text-center font-bold ${row.cs2 > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.cs2 || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.cs3 > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.cs3 || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.arm > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.arm || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.rs > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.rs || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.ln3 > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.ln3 || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.ln5 > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.ln5 || ''}</td>
-            <td class="py-2 px-2 text-center font-bold ${row.rc > 0 ? 'text-indigo-700 bg-indigo-50/50' : ''}">${row.rc || ''}</td>
-            <td class="py-1.5 px-2 text-center bg-fuchsia-50/60 border-l border-fuchsia-200">
-              <input type="number" min="0" value="${row.lminiL || ''}" data-out-idx="${idx}" data-out-field="lminiL"
-                class="w-14 px-1 py-0.5 text-center font-bold text-fuchsia-900 border border-fuchsia-300 rounded bg-white">
+            ${stdCells}
+            <td class="py-1.5 px-1.5 text-center bg-fuchsia-50/60 border-l border-fuchsia-200">
+              <input type="number" min="0" value="${lminiLVal > 0 ? lminiLVal : ''}" data-out-idx="${idx}" data-out-field="lminiL"
+                placeholder="-"
+                class="w-12 px-1 py-0.5 text-center font-bold ${lminiLVal > 0 ? 'text-fuchsia-900 border-fuchsia-400 bg-white' : 'text-slate-400 border-fuchsia-200 bg-white/70'} border rounded text-xs">
             </td>
-            <td class="py-1.5 px-2 text-center bg-fuchsia-50/60 border-r border-fuchsia-200">
-              <input type="number" min="0" value="${row.lminiR || ''}" data-out-idx="${idx}" data-out-field="lminiR"
-                class="w-14 px-1 py-0.5 text-center font-bold text-indigo-900 border border-indigo-300 rounded bg-white">
+            <td class="py-1.5 px-1.5 text-center bg-fuchsia-50/60 border-r border-fuchsia-200">
+              <input type="number" min="0" value="${lminiRVal > 0 ? lminiRVal : ''}" data-out-idx="${idx}" data-out-field="lminiR"
+                placeholder="-"
+                class="w-12 px-1 py-0.5 text-center font-bold ${lminiRVal > 0 ? 'text-indigo-900 border-indigo-400 bg-white' : 'text-slate-400 border-indigo-200 bg-white/70'} border rounded text-xs">
+            </td>
+            <td class="py-1.5 px-1.5 text-center ${lbigVal > 0 ? 'bg-indigo-50/70' : ''}">
+              <input type="number" min="0" value="${lbigVal > 0 ? lbigVal : ''}" data-out-idx="${idx}" data-out-field="lbig"
+                placeholder="-"
+                class="w-12 px-1 py-0.5 text-center font-bold ${lbigVal > 0 ? 'text-indigo-900 border-indigo-400 bg-white' : 'text-slate-500 border-slate-200 bg-slate-50/60'} border rounded text-xs">
+            </td>
+            <td class="py-2 px-2 text-center font-extrabold text-sm ${m.totalUnits > 0 ? 'text-emerald-800 bg-emerald-50/80' : 'text-slate-400 bg-slate-50'} border-x border-emerald-200">
+              ${m.totalUnits > 0 ? `${m.totalUnits}` : '-'}
             </td>
             <td class="py-1.5 px-2">
               <input type="text" value="${row.outsourceNote || ''}" data-out-idx="${idx}" data-out-field="outsourceNote"
@@ -855,8 +883,8 @@
 
       tfoot.innerHTML = `
         <tr class="bg-slate-900 text-white font-bold text-xs">
-          <td colspan="3" class="py-3 px-3">รวมจำนวนตัดทุกรุ่น: <span class="text-amber-300 text-sm ml-1">${this.fmt(totals.grandTotalUnits, 0)} ชุด</span></td>
-          <td class="py-3 px-2 text-center text-amber-300">≈ ${this.fmt(totals.grandTotalCalcRolls, 0)} ม้วน</td>
+          <td colspan="3" class="py-3 px-3">รวมจำนวนตัดทุกรุ่น (ซิงค์มุมมองที่ 1): <span class="text-amber-300 text-sm ml-1">${this.fmt(totals.grandTotalUnits, 0)} ชุด</span></td>
+          <td class="py-3 px-2 text-center text-amber-300">≈ ${this.fmt(totals.grandTotalCalcRolls, 1)} ม้วน (${this.fmt(totals.grandTotalUsedYards, 1)} หลา)</td>
           <td class="py-3 px-2 text-center">${totals.modelQtyTotals.cs2 || 0}</td>
           <td class="py-3 px-2 text-center">${totals.modelQtyTotals.cs3 || 0}</td>
           <td class="py-3 px-2 text-center">${totals.modelQtyTotals.arm || 0}</td>
@@ -866,6 +894,8 @@
           <td class="py-3 px-2 text-center">${totals.modelQtyTotals.rc || 0}</td>
           <td class="py-3 px-2 text-center text-fuchsia-300 bg-fuchsia-950">${totals.totalLMiniL}</td>
           <td class="py-3 px-2 text-center text-indigo-300 bg-indigo-950">${totals.totalLMiniR}</td>
+          <td class="py-3 px-2 text-center">${totals.modelQtyTotals.lbig || 0}</td>
+          <td class="py-3 px-2 text-center text-emerald-300 bg-emerald-950 text-sm">${this.fmt(totals.grandTotalUnits, 0)}</td>
           <td class="py-3 px-3 text-amber-200">ค่าแรงตัดรวมรอบนี้: ฿${this.fmt(totals.grandTotalCutWage, 2)}</td>
         </tr>
       `;
@@ -876,16 +906,44 @@
           const field = e.target.getAttribute('data-out-field');
           const row = round.rows[idx];
           if (!row) return;
-          if (field === 'lminiL' || field === 'lminiR') {
-            row[field] = Number(e.target.value || 0);
-            row.lmini = Number(row.lminiL || 0) + Number(row.lminiR || 0);
-          } else {
+          if (field === 'orderRollsText' || field === 'outsourceNote') {
             row[field] = e.target.value;
+            if (field === 'orderRollsText') {
+              const mRoll = String(e.target.value).match(/(\d+(?:\.\d+)?)\s*ม้วน/);
+              if (mRoll && (!row.sentYards || Number(row.sentYards) === 0)) {
+                row.sentYards = Number(mRoll[1]) * 50;
+              }
+            }
+          } else {
+            row[field] = Number(e.target.value || 0);
+            if (field === 'lminiL' || field === 'lminiR') {
+              row.lmini = Number(row.lminiL || 0) + Number(row.lminiR || 0);
+            }
           }
           this.save();
           this.renderMatrixTab();
         });
       });
+    },
+
+    autoFillOutsourceRolls() {
+      const round = this.getActiveRound();
+      if (!round) return;
+      let updated = 0;
+      (round.rows || []).forEach(row => {
+        const m = computeRowMetrics(row, round.formulaMode);
+        if (m.calcRolls > 0) {
+          const roundedRolls = Math.ceil(m.calcRolls);
+          row.orderRollsText = `${roundedRolls} ม้วน`;
+          if (!row.sentYards || Number(row.sentYards) === 0) {
+            row.sentYards = roundedRolls * 50;
+          }
+          updated++;
+        }
+      });
+      this.save();
+      this.renderMatrixTab();
+      this.toast(`ดึงจำนวนม้วนตามสูตรใส่ช่องส่งไม้เรียบร้อย (${updated} สีผ้า)!`);
     },
 
     // -----------------------------------------------------------------------
@@ -1152,7 +1210,7 @@
     },
 
     // -----------------------------------------------------------------------
-    // TAB C: PRE-ORDER DAILY MATRIX (LEGS & GEARS) + SPARE PARTS + BILLING
+    // TAB C: PRE-ORDER DAILY MATRIX (LEGS & GEARS) + UPLOAD + SPARE PARTS + BILLING
     // -----------------------------------------------------------------------
     renderPreOrderAndBillingTab() {
       const d = this.data;
@@ -1161,52 +1219,129 @@
       const billTbody = document.getElementById('monthly-billing-tbody');
       if (!poTbody) return;
 
+      // Populate manual SKU selector if empty
+      const skuSelect = document.getElementById('po-manual-sku');
+      if (skuSelect && skuSelect.options.length === 0) {
+        skuSelect.innerHTML = ROUTINE_FABRICS.map(f =>
+          `<option value="${f.sku}">${f.sku} (${f.color} - ${f.group})</option>`
+        ).join('');
+      }
+
       let totalUnitsAll = 0;
       let totalYardsAll = 0;
       let totalLegsAll = 0;
       let totalGearsAll = 0;
 
-      poTbody.innerHTML = (d.preOrderDailyRecords || []).map((rec) => {
-        const entries = Object.entries(rec.colorBreakdown || {});
-        const sumUnits = entries.reduce((s, [, q]) => s + Number(q || 0), 0);
-        const sumYards = sumUnits * Number(rec.yardsPerUnit || 0);
-        const sumRolls = sumYards / 50;
-        const sumLegs = sumUnits * Number(rec.legsPerUnit || 6);
-        const sumLegBags = sumLegs / 500; // 500 legs per bag
-        const sumGears = sumUnits * Number(rec.gearPerUnit || 0);
-        const sumGearBoxes = sumGears / 15; // 15 pairs per box
-
-        totalUnitsAll += sumUnits;
-        totalYardsAll += sumYards;
-        totalLegsAll += sumLegs;
-        totalGearsAll += sumGears;
-
-        const breakdownBadges = entries.map(([sku, q]) =>
-          `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300 text-[11px] font-semibold">${sku}: <strong class="text-indigo-700">${q}</strong></span>`
-        ).join(' ');
-
-        return `
-          <tr class="border-b border-slate-200 text-xs hover:bg-slate-50">
-            <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${rec.dateRange}</td>
-            <td class="py-2.5 px-3 font-bold text-slate-900 whitespace-nowrap">${rec.modelLabel}</td>
-            <td class="py-2.5 px-3">
-              <div class="flex flex-wrap gap-1">${breakdownBadges}</div>
-            </td>
-            <td class="py-2.5 px-3 text-center font-extrabold text-slate-900 bg-slate-50">${this.fmt(sumUnits, 0)} ตัว</td>
-            <td class="py-2.5 px-3 text-right font-bold text-indigo-800">
-              ${this.fmt(sumYards, 1)} หลา
-              <div class="text-[10px] text-fuchsia-700">(${this.fmt(sumRolls, 1)} ม้วน)</div>
-            </td>
-            <td class="py-2.5 px-3 text-right bg-amber-50/60 font-semibold text-amber-900">
-              ${this.fmt(sumLegs, 0)} ขา
-              <div class="text-[10px] text-amber-700 font-bold">≈ ${this.fmt(sumLegBags, 2)} ถุง (÷500)</div>
-            </td>
-            <td class="py-2.5 px-3 text-right bg-emerald-50/60 font-semibold text-emerald-900">
-              ${sumGears > 0 ? `${this.fmt(sumGears, 0)} คู่ <div class="text-[10px] text-emerald-700 font-bold">≈ ${this.fmt(sumGearBoxes, 1)} ลัง (÷15)</div>` : '-'}
+      const records = d.preOrderDailyRecords || [];
+      if (records.length === 0) {
+        poTbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-8 text-center text-slate-400 text-xs">
+              ยังไม่มีรายการ Pre-Order • ลากไฟล์ Excel (.xlsx / .csv) มาวางในกล่องด้านบน หรือเพิ่มรายการด่วนได้เลยครับ
             </td>
           </tr>
         `;
-      }).join('');
+      } else {
+        poTbody.innerHTML = records.map((rec, rIdx) => {
+          const entries = Object.entries(rec.colorBreakdown || {}).filter(([, q]) => Number(q || 0) > 0);
+          const sumUnits = entries.reduce((s, [, q]) => s + Number(q || 0), 0);
+          const sumYards = sumUnits * Number(rec.yardsPerUnit || 0);
+          const sumRolls = sumYards / 50;
+          const sumLegs = sumUnits * Number(rec.legsPerUnit || 6);
+          const sumLegBags = sumLegs / 500; // 500 legs per bag
+          const sumGears = sumUnits * Number(rec.gearPerUnit || 0);
+          const sumGearBoxes = sumGears / 15; // 15 pairs per box
+
+          totalUnitsAll += sumUnits;
+          totalYardsAll += sumYards;
+          totalLegsAll += sumLegs;
+          totalGearsAll += sumGears;
+
+          const breakdownBadges = entries.map(([sku, q]) => {
+            const fab = ROUTINE_FABRICS.find(f => f.sku.toLowerCase() === sku.toLowerCase() || f.shortCode.toLowerCase() === sku.toLowerCase());
+            const colorHint = fab ? ` (${fab.color})` : '';
+            const lrInfo = rec.lminiLR && rec.lminiLR[sku]
+              ? ` <span class="text-[10px] text-fuchsia-700 font-bold">[L:${rec.lminiLR[sku].L || 0}/R:${rec.lminiLR[sku].R || 0}]</span>`
+              : '';
+            return `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 hover:bg-indigo-50 text-slate-800 border border-slate-300 text-[11px] font-semibold">
+                <span>${sku}${colorHint}:</span>
+                <input type="number" min="0" value="${q}" data-po-rec-idx="${rIdx}" data-po-sku="${sku}"
+                  class="w-11 px-1 py-0 text-center font-extrabold text-indigo-700 bg-white border border-indigo-200 rounded text-[11px]">
+                ${lrInfo}
+              </span>
+            `;
+          }).join(' ');
+
+          return `
+            <tr class="border-b border-slate-200 text-xs hover:bg-slate-50">
+              <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">
+                <input type="text" value="${rec.dateRange || ''}" data-po-date-idx="${rIdx}"
+                  class="w-28 px-1.5 py-0.5 text-xs font-semibold text-indigo-700 bg-indigo-50/50 border border-indigo-200 rounded">
+              </td>
+              <td class="py-2.5 px-3 font-bold text-slate-900 whitespace-nowrap">${rec.modelLabel}</td>
+              <td class="py-2 px-3">
+                <div class="flex flex-wrap gap-1.5 items-center">${breakdownBadges || '<span class="text-slate-400">-</span>'}</div>
+              </td>
+              <td class="py-2.5 px-3 text-center font-extrabold text-slate-900 bg-slate-50">${this.fmt(sumUnits, 0)} ตัว</td>
+              <td class="py-2.5 px-3 text-right font-bold text-indigo-800 whitespace-nowrap">
+                ${this.fmt(sumYards, 1)} หลา
+                <div class="text-[10px] text-fuchsia-700">(${this.fmt(sumRolls, 1)} ม้วน)</div>
+              </td>
+              <td class="py-2.5 px-3 text-right bg-amber-50/60 font-semibold text-amber-900 whitespace-nowrap">
+                ${this.fmt(sumLegs, 0)} ขา
+                <div class="text-[10px] text-amber-700 font-bold">≈ ${this.fmt(sumLegBags, 2)} ถุง (÷500)</div>
+              </td>
+              <td class="py-2.5 px-3 text-right bg-emerald-50/60 font-semibold text-emerald-900 whitespace-nowrap">
+                ${sumGears > 0 ? `${this.fmt(sumGears, 0)} คู่ <div class="text-[10px] text-emerald-700 font-bold">≈ ${this.fmt(sumGearBoxes, 1)} ลัง (÷15)</div>` : '-'}
+              </td>
+              <td class="py-2.5 px-2 text-center">
+                <button type="button" data-po-del-idx="${rIdx}" title="ลบแถวนี้"
+                  class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-[11px] font-bold transition">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      poTbody.querySelectorAll('[data-po-rec-idx]').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+          const rIdx = Number(e.target.getAttribute('data-po-rec-idx'));
+          const sku = e.target.getAttribute('data-po-sku');
+          const val = Number(e.target.value || 0);
+          const rec = d.preOrderDailyRecords[rIdx];
+          if (!rec || !rec.colorBreakdown) return;
+          if (val <= 0) {
+            delete rec.colorBreakdown[sku];
+          } else {
+            rec.colorBreakdown[sku] = val;
+          }
+          this.save();
+          this.renderPreOrderAndBillingTab();
+        });
+      });
+
+      poTbody.querySelectorAll('[data-po-date-idx]').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+          const rIdx = Number(e.target.getAttribute('data-po-date-idx'));
+          if (d.preOrderDailyRecords[rIdx]) {
+            d.preOrderDailyRecords[rIdx].dateRange = e.target.value;
+            this.save();
+          }
+        });
+      });
+
+      poTbody.querySelectorAll('[data-po-del-idx]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const rIdx = Number(e.currentTarget.getAttribute('data-po-del-idx'));
+          d.preOrderDailyRecords.splice(rIdx, 1);
+          this.save();
+          this.renderPreOrderAndBillingTab();
+          this.toast('ลบแถวรายการ Pre-Order เรียบร้อย');
+        });
+      });
 
       const poFoot = document.getElementById('preorder-daily-tfoot');
       if (poFoot) {
@@ -1217,6 +1352,7 @@
             <td class="py-2.5 px-3 text-right text-emerald-300">${this.fmt(totalYardsAll, 1)} หลา (${this.fmt(totalYardsAll / 50, 1)} ม้วน)</td>
             <td class="py-2.5 px-3 text-right text-amber-300">${this.fmt(totalLegsAll, 0)} ขา (${this.fmt(totalLegsAll / 500, 2)} ถุง)</td>
             <td class="py-2.5 px-3 text-right text-emerald-300">${this.fmt(totalGearsAll, 0)} คู่ (${this.fmt(totalGearsAll / 15, 1)} ลัง)</td>
+            <td class="py-2.5 px-2"></td>
           </tr>
         `;
       }
@@ -1272,6 +1408,574 @@
           `;
         }).join('');
       }
+    },
+
+    // Helper: Match a string header or cell to a ROUTINE_FABRICS entry
+    matchFabricFromText(rawText) {
+      if (!rawText) return null;
+      const s = String(rawText).trim().toLowerCase();
+      if (!s) return null;
+      // 1. Exact or substring SKU match
+      for (const f of ROUTINE_FABRICS) {
+        if (s === f.sku.toLowerCase() || s.includes(f.sku.toLowerCase())) return f;
+      }
+      // 2. Shortcode match (e.g., 337-29, 337-07, 736b-04, 358-1a, c-06)
+      for (const f of ROUTINE_FABRICS) {
+        const sc = f.shortCode.toLowerCase();
+        if (s === sc || s.includes(sc)) return f;
+      }
+      // 3. Color name match
+      for (const f of ROUTINE_FABRICS) {
+        if (s === f.color.toLowerCase()) return f;
+      }
+      return null;
+    },
+
+    // Helper: Match a string header or cell to a model key + optional L/R side
+    matchModelFromText(rawText) {
+      if (!rawText) return null;
+      const s = String(rawText).trim().toLowerCase();
+      if (!s) return null;
+      if (s.includes('l-mini') || s.includes('l mini') || s.includes('lmini') || s.includes('แอลมินิ')) {
+        if (s.includes('ขวา') || /\br\b|\(r\)/i.test(s)) return { key: 'lmini', side: 'R' };
+        if (s.includes('ซ้าย') || /\bl\b|\(l\)/i.test(s)) return { key: 'lmini', side: 'L' };
+        return { key: 'lmini', side: 'L' };
+      }
+      if (s.includes('l ใหญ่') || s.includes('l-ใหญ่') || s.includes('lbig') || s.includes('แอลใหญ่')) return { key: 'lbig' };
+      if (s.includes('cs2') || s.includes('2pl') || s.includes('2 pl') || s.includes('2 ที่นั่ง')) return { key: 'cs2' };
+      if (s.includes('cs3') || s.includes('3pl') || s.includes('3 pl') || s.includes('3 ที่นั่ง')) return { key: 'cs3' };
+      if (s.includes('เฉพาะแขน') || s.includes('แขน new') || s.includes('แขน')) return { key: 'arm' };
+      if (s.includes('กระดก') || /\brs\b/i.test(s)) return { key: 'rs' };
+      if (s.includes('19 เม็ด') || s.includes('ln3') || s.includes('ln 3')) return { key: 'ln3' };
+      if (s.includes('5 เม็ด') || s.includes('ln5') || s.includes('ln 5') || /\bln\b/i.test(s)) return { key: 'ln5' };
+      if (s.includes('ปรับนอน') || /\brc\b/i.test(s) || /\bpn\b/i.test(s)) return { key: 'rc' };
+      return null;
+    },
+
+    getModelMeta(modelKey) {
+      const m = ROUTINE_MODELS.find(x => x.key === modelKey) || ROUTINE_MODELS[0];
+      const labelMap = {
+        cs2: 'CS2 / 2 PL (3.20 หลา)',
+        cs3: 'CS3 / 3 PL (4.33 หลา)',
+        arm: 'เฉพาะแขน New (1.93 หลา)',
+        rs: 'RS หัวกระดก (6.26 หลา)',
+        ln3: 'LN3 กระดุม 19 เม็ด (6.21 หลา)',
+        ln5: 'LN กระดุม 5 เม็ด (6.17 หลา)',
+        rc: 'RC/PN ปรับนอน (6.65 หลา)',
+        lmini: 'L-Mini แอลมินิ (8.97 หลา)',
+        lbig: 'L ใหญ่ (11.00 หลา)'
+      };
+      return {
+        modelKey: m.key,
+        modelLabel: labelMap[m.key] || `${m.label} (${m.yards} หลา)`,
+        yardsPerUnit: m.yards,
+        legsPerUnit: m.legs,
+        gearPerUnit: m.gear
+      };
+    },
+
+    // Handle uploaded or dropped Excel/CSV files in Tab 3
+    handlePreOrderFilesUpload(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      if (typeof XLSX === 'undefined') {
+        this.toast('ไม่พบไลบรารี XLSX สำหรับอ่านไฟล์', '⚠️');
+        return;
+      }
+
+      const dateLabel = (document.getElementById('preorder-upload-date-label')?.value || '').trim() ||
+        `อัปโหลด ${new Date().toLocaleDateString('th-TH', { day: '2-digit', month: 'short' })}`;
+      const uploadMode = document.getElementById('preorder-upload-mode')?.value || 'REPLACE';
+      const statusEl = document.getElementById('preorder-upload-status');
+
+      // Aggregated map: modelKey -> { colorBreakdown: { sku: qty }, lminiLR: { sku: { L, R } } }
+      const aggByModel = {};
+      const addItem = (modelKey, sku, qty, side) => {
+        const num = Number(qty || 0);
+        if (!modelKey || !sku || isNaN(num) || num <= 0) return;
+        if (!aggByModel[modelKey]) {
+          aggByModel[modelKey] = { colorBreakdown: {}, lminiLR: {} };
+        }
+        aggByModel[modelKey].colorBreakdown[sku] = (aggByModel[modelKey].colorBreakdown[sku] || 0) + num;
+        if (modelKey === 'lmini') {
+          if (!aggByModel[modelKey].lminiLR[sku]) aggByModel[modelKey].lminiLR[sku] = { L: 0, R: 0 };
+          if (side === 'R') aggByModel[modelKey].lminiLR[sku].R += num;
+          else aggByModel[modelKey].lminiLR[sku].L += num;
+        }
+      };
+
+      const files = Array.from(fileList);
+      let processedFiles = 0;
+      let totalParsedUnits = 0;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+
+            wb.SheetNames.forEach(sheetName => {
+              const sheet = wb.Sheets[sheetName];
+              const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+              if (!rows || rows.length < 2) return;
+
+              // Find header row (first 10 rows) that has either multiple model names OR multiple fabric SKUs
+              let headerRowIdx = -1;
+              let colModels = {}; // colIdx -> { key, side }
+              let colFabrics = {}; // colIdx -> fab
+
+              for (let r = 0; r < Math.min(12, rows.length); r++) {
+                const rowCells = rows[r] || [];
+                const tempModels = {};
+                const tempFabrics = {};
+                rowCells.forEach((cellVal, cIdx) => {
+                  const mMatch = this.matchModelFromText(cellVal);
+                  // Ignore "รวมหลา" columns when importing unit counts
+                  if (mMatch && !String(cellVal).includes('รวมหลา')) {
+                    tempModels[cIdx] = mMatch;
+                  }
+                  const fMatch = this.matchFabricFromText(cellVal);
+                  if (fMatch) {
+                    tempFabrics[cIdx] = fMatch;
+                  }
+                });
+
+                // Check next row too in case of 2-row merged header (e.g. L-Mini ซ้าย / ขวา on row r+1)
+                if (Object.keys(tempModels).length >= 2) {
+                  headerRowIdx = r;
+                  colModels = tempModels;
+                  if (rows[r + 1]) {
+                    rows[r + 1].forEach((subCell, cIdx) => {
+                      const sText = String(subCell || '').trim().toLowerCase();
+                      if (sText.includes('รวมหลา')) {
+                        delete colModels[cIdx];
+                      } else if (sText.includes('ขวา') || sText === 'r' || sText.includes('(r)')) {
+                        colModels[cIdx] = { key: 'lmini', side: 'R' };
+                      } else if (sText.includes('ซ้าย') || sText === 'l' || sText.includes('(l)')) {
+                        colModels[cIdx] = { key: 'lmini', side: 'L' };
+                      }
+                    });
+                  }
+                  break;
+                }
+                if (Object.keys(tempFabrics).length >= 3) {
+                  headerRowIdx = r;
+                  colFabrics = tempFabrics;
+                  break;
+                }
+              }
+
+              // CASE 1: Matrix where Rows = Fabric SKUs, Columns = Models (like ใบเบิกผ้า / ใบสั่งตัดนอก / เทมเพรส Pre-Order)
+              if (headerRowIdx >= 0 && Object.keys(colModels).length >= 2) {
+                for (let r = headerRowIdx + 1; r < rows.length; r++) {
+                  const row = rows[r] || [];
+                  const firstCellsText = row.slice(0, 4).join(' ');
+                  if (firstCellsText.includes('รวมจำนวน') || firstCellsText.includes('ราคาค่าแรง')) break;
+                  let fab = null;
+                  for (let c = 0; c < Math.min(4, row.length); c++) {
+                    fab = this.matchFabricFromText(row[c]);
+                    if (fab) break;
+                  }
+                  if (!fab) continue;
+
+                  Object.entries(colModels).forEach(([cIdxStr, mInfo]) => {
+                    const cIdx = Number(cIdxStr);
+                    const rawVal = row[cIdx];
+                    const qty = parseFloat(String(rawVal || '').replace(/[^0-9.-]/g, ''));
+                    if (!isNaN(qty) && qty > 0) {
+                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
+                      totalParsedUnits += qty;
+                    }
+                  });
+                }
+              }
+              // CASE 2: Transposed Matrix where Rows = Models, Columns = Fabric SKUs
+              else if (headerRowIdx >= 0 && Object.keys(colFabrics).length >= 3) {
+                for (let r = headerRowIdx + 1; r < rows.length; r++) {
+                  const row = rows[r] || [];
+                  let mInfo = null;
+                  for (let c = 0; c < Math.min(4, row.length); c++) {
+                    mInfo = this.matchModelFromText(row[c]);
+                    if (mInfo) break;
+                  }
+                  if (!mInfo) continue;
+
+                  Object.entries(colFabrics).forEach(([cIdxStr, fab]) => {
+                    const cIdx = Number(cIdxStr);
+                    const qty = parseFloat(String(row[cIdx] || '').replace(/[^0-9.-]/g, ''));
+                    if (!isNaN(qty) && qty > 0) {
+                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
+                      totalParsedUnits += qty;
+                    }
+                  });
+                }
+              }
+              // CASE 3: Flat Order List (each row has Model + Fabric SKU/Color + Qty)
+              else {
+                for (let r = 0; r < rows.length; r++) {
+                  const row = rows[r] || [];
+                  const rowText = row.join(' ');
+                  const mInfo = this.matchModelFromText(rowText);
+                  const fab = this.matchFabricFromText(rowText);
+                  if (mInfo && fab) {
+                    // Find last numeric column as quantity
+                    let qty = 0;
+                    for (let c = row.length - 1; c >= 0; c--) {
+                      const v = parseFloat(String(row[c] || '').replace(/[^0-9.-]/g, ''));
+                      if (!isNaN(v) && v > 0 && v < 5000) {
+                        qty = v;
+                        break;
+                      }
+                    }
+                    if (qty > 0) {
+                      addItem(mInfo.key, fab.sku, qty, mInfo.side);
+                      totalParsedUnits += qty;
+                    }
+                  }
+                }
+              }
+            });
+          } catch (err) {
+            console.error('PreOrder upload parse error:', err);
+          } finally {
+            processedFiles++;
+            if (processedFiles === files.length) {
+              this.finalizePreOrderUpload(aggByModel, dateLabel, uploadMode, totalParsedUnits, files.map(f => f.name).join(', '), statusEl);
+            }
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    },
+
+    finalizePreOrderUpload(aggByModel, dateLabel, uploadMode, totalParsedUnits, fileNames, statusEl) {
+      const modelKeys = Object.keys(aggByModel);
+      if (modelKeys.length === 0 || totalParsedUnits === 0) {
+        this.toast('ไม่พบข้อมูลรุ่นโซฟาหรือรหัสสีผ้าในไฟล์ที่อัปโหลด กรุณาตรวจสอบหัวตารางหรือใช้เทมเพรส Pre-Order', '⚠️');
+        if (statusEl) {
+          statusEl.className = 'mt-3 px-3 py-2 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs font-semibold';
+          statusEl.textContent = `❌ ไม่พบข้อมูลที่ตรงกับรหัสผ้า/รุ่นโซฟาในไฟล์ "${fileNames}" (แนะนำกดปุ่ม "📄 ดาวน์โหลดเทมเพรส Pre-Order" เพื่อดูรูปแบบตาราง)`;
+          statusEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (uploadMode === 'REPLACE') {
+        this.data.preOrderDailyRecords = [];
+      }
+
+      const orderModels = ['cs2', 'cs3', 'arm', 'rs', 'ln3', 'ln5', 'rc', 'lmini', 'lbig'];
+      orderModels.forEach(mKey => {
+        if (!aggByModel[mKey]) return;
+        const meta = this.getModelMeta(mKey);
+        const existing = this.data.preOrderDailyRecords.find(r => r.dateRange === dateLabel && r.modelKey === mKey);
+        if (existing && uploadMode === 'APPEND') {
+          Object.entries(aggByModel[mKey].colorBreakdown).forEach(([sku, q]) => {
+            existing.colorBreakdown[sku] = Number(existing.colorBreakdown[sku] || 0) + Number(q || 0);
+          });
+          existing.lminiLR = existing.lminiLR || {};
+          Object.entries(aggByModel[mKey].lminiLR || {}).forEach(([sku, lr]) => {
+            if (!existing.lminiLR[sku]) existing.lminiLR[sku] = { L: 0, R: 0 };
+            existing.lminiLR[sku].L += Number(lr.L || 0);
+            existing.lminiLR[sku].R += Number(lr.R || 0);
+          });
+        } else {
+          this.data.preOrderDailyRecords.push({
+            dateRange: dateLabel,
+            modelKey: meta.modelKey,
+            modelLabel: meta.modelLabel,
+            yardsPerUnit: meta.yardsPerUnit,
+            legsPerUnit: meta.legsPerUnit,
+            gearPerUnit: meta.gearPerUnit,
+            colorBreakdown: aggByModel[mKey].colorBreakdown,
+            lminiLR: aggByModel[mKey].lminiLR
+          });
+        }
+      });
+
+      this.save();
+      this.renderPreOrderAndBillingTab();
+
+      if (statusEl) {
+        statusEl.className = 'mt-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center justify-between';
+        statusEl.innerHTML = `
+          <span>✅ อัปโหลดไฟล์ <strong>${fileNames}</strong> สำเร็จ! ดึงยอดรวม <strong>${this.fmt(totalParsedUnits, 0)} ชุด</strong> (${modelKeys.length} รุ่น) คำนวณหลา/ขา/เกียร์เรียบร้อย</span>
+          <span class="text-[11px] text-indigo-700 font-bold">กดปุ่ม "🚀 ส่งยอด Pre-Order นี้ไปตั้งต้นใบเบิกผ้า (Tab 1 & Tab 2)" ได้ทันที</span>
+        `;
+        statusEl.classList.remove('hidden');
+      }
+      this.toast(`อัปโหลด Pre-Order สำเร็จ (${this.fmt(totalParsedUnits, 0)} ชุด)!`);
+    },
+
+    // Push current Tab 3 Pre-Order records directly into Tab 1 (Active Cutting Round) & Tab 2 (Cut-Sew Stock preOrder)
+    pushPreOrderRecordsToTab1AndTab2() {
+      const records = this.data.preOrderDailyRecords || [];
+      if (records.length === 0) {
+        this.toast('ยังไม่มีข้อมูล Pre-Order ในตารางที่จะส่งไป Tab 1', '⚠️');
+        return;
+      }
+      const round = this.getActiveRound();
+      if (!round) return;
+
+      // Reset current round model quantities first so it cleanly reflects the Pre-Order
+      const modelKeys = ['cs2', 'cs3', 'arm', 'rs', 'ln3', 'ln5', 'rc', 'lmini', 'lminiL', 'lminiR', 'lbig'];
+      (round.rows || []).forEach(r => {
+        modelKeys.forEach(k => { r[k] = 0; });
+      });
+
+      let totalPushed = 0;
+      records.forEach(rec => {
+        const mKey = rec.modelKey || (this.matchModelFromText(rec.modelLabel)?.key) || 'cs3';
+        Object.entries(rec.colorBreakdown || {}).forEach(([rawSku, qty]) => {
+          const num = Number(qty || 0);
+          if (num <= 0) return;
+          const fab = this.matchFabricFromText(rawSku);
+          const sku = fab ? fab.sku : rawSku;
+          const row = (round.rows || []).find(r => r.sku.toLowerCase() === sku.toLowerCase() || r.shortCode.toLowerCase() === sku.toLowerCase());
+          if (row) {
+            if (mKey === 'lmini') {
+              const lr = rec.lminiLR && rec.lminiLR[rawSku];
+              if (lr && (lr.L > 0 || lr.R > 0)) {
+                row.lminiL = Number(row.lminiL || 0) + Number(lr.L || 0);
+                row.lminiR = Number(row.lminiR || 0) + Number(lr.R || 0);
+              } else {
+                const halfL = Math.ceil(num / 2);
+                const halfR = num - halfL;
+                row.lminiL = Number(row.lminiL || 0) + halfL;
+                row.lminiR = Number(row.lminiR || 0) + halfR;
+              }
+              row.lmini = Number(row.lminiL || 0) + Number(row.lminiR || 0);
+            } else {
+              row[mKey] = Number(row[mKey] || 0) + num;
+            }
+            totalPushed += num;
+          }
+
+          // Also sync to Tab 2 Cut-Sew Stock preOrder if matching row exists
+          if (mKey === 'lmini') {
+            const lmRow = (this.data.cutSewStockLMini || []).find(x => x.sku.toLowerCase() === sku.toLowerCase());
+            if (lmRow) {
+              const lr = rec.lminiLR && rec.lminiLR[rawSku];
+              if (lr && (lr.L > 0 || lr.R > 0)) {
+                lmRow.orderL = Number(lr.L || 0);
+                lmRow.orderR = Number(lr.R || 0);
+              } else {
+                lmRow.orderL = Math.ceil(num / 2);
+                lmRow.orderR = num - lmRow.orderL;
+              }
+            }
+          } else {
+            const stdRow = (this.data.cutSewStockStandard || []).find(x => x.modelKey === mKey && x.sku.toLowerCase() === sku.toLowerCase());
+            if (stdRow) {
+              stdRow.preOrder = num;
+            }
+          }
+        });
+      });
+
+      this.save();
+      this.renderAll();
+      if (typeof window.switchFabricTab === 'function') {
+        window.switchFabricTab('tab-admin-routine');
+      }
+      this.toast(`ส่งยอด Pre-Order รวม ${this.fmt(totalPushed, 0)} ชุด เข้าใบเบิกผ้า & ใบสั่งตัดนอก (Tab 1) เรียบร้อย!`);
+    },
+
+    // Download clean styled Pre-Order Excel template for Admin to fill & drag-drop
+    downloadPreOrderTemplateExcel() {
+      if (typeof XLSX === 'undefined') {
+        this.toast('ไม่พบไลบรารี XLSX', '⚠️');
+        return;
+      }
+
+      const borderThin = {
+        top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+      };
+
+      const headers = [
+        'กลุ่มผ้า', 'เบอร์สี SKU', 'สีผ้า',
+        '2 PL (CS2)', '3 PL (CS3)', 'เฉพาะแขน New', 'กระดก (RS)',
+        'กระดุม 19 เม็ด (LN3)', 'กระดุม 5 เม็ด (LN5)', 'ปรับนอน (RC)',
+        'L-mini ซ้าย (L)', 'L-mini ขวา (R)', 'L ใหญ่', 'รวมชุดสั่งตัด'
+      ];
+
+      const aoa = [
+        ['เทมเพรสอัปโหลดยอด Pre-Order แยกรุ่นแยกสี (QueenCosy) — กรอกเฉพาะจำนวนชุด แล้วลากไฟล์นี้วางใน Tab 3 ได้เลย', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        headers
+      ];
+
+      ROUTINE_FABRICS.forEach((f, idx) => {
+        const rNum = idx + 3;
+        aoa.push([
+          f.group, f.sku, f.color,
+          '', '', '', '', '', '', '', '', '', '',
+          { t: 'n', f: `SUM(D${rNum}:M${rNum})`, v: 0 }
+        ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 13 } }];
+      ws['!cols'] = [
+        { wch: 12 }, { wch: 16 }, { wch: 14 },
+        { wch: 12 }, { wch: 12 }, { wch: 13 }, { wch: 12 },
+        { wch: 17 }, { wch: 17 }, { wch: 13 },
+        { wch: 15 }, { wch: 15 }, { wch: 11 }, { wch: 14 }
+      ];
+
+      // Style Title Row
+      for (let c = 0; c <= 13; c++) {
+        const ref = XLSX.utils.encode_cell({ r: 0, c });
+        if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+        ws[ref].s = {
+          fill: { fgColor: { rgb: '1E1B4B' } },
+          font: { name: 'Tahoma', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+          alignment: { horizontal: 'left', vertical: 'center' }
+        };
+      }
+
+      // Style Header Row
+      for (let c = 0; c <= 13; c++) {
+        const ref = XLSX.utils.encode_cell({ r: 1, c });
+        if (!ws[ref]) continue;
+        const bg = (c === 10 || c === 11) ? '701A75' : (c === 13 ? '065F46' : '0F172A');
+        ws[ref].s = {
+          fill: { fgColor: { rgb: bg } },
+          font: { name: 'Tahoma', sz: 10, bold: true, color: { rgb: 'FFFFFF' } },
+          alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+          border: borderThin
+        };
+      }
+
+      // Style Data Rows by Fabric Group
+      ROUTINE_FABRICS.forEach((f, idx) => {
+        const r = idx + 2;
+        const rowBg =
+          f.group === 'PVC หนัง' ? 'FFFBEB' :
+          f.group === 'ลูกฟูก' ? 'ECFDF5' :
+          f.group === 'Hollan' ? 'F0F9FF' : 'FAF5FF';
+        for (let c = 0; c <= 13; c++) {
+          const ref = XLSX.utils.encode_cell({ r, c });
+          if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+          ws[ref].s = {
+            fill: { fgColor: { rgb: (c === 10 || c === 11) ? 'FDF4FF' : (c === 13 ? 'D1FAE5' : rowBg) } },
+            font: { name: 'Tahoma', sz: 10, bold: c <= 2 || c === 13, color: { rgb: '0F172A' } },
+            alignment: { horizontal: c <= 2 ? 'left' : 'center', vertical: 'center' },
+            border: borderThin
+          };
+        }
+      });
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'PreOrder_Template');
+      XLSX.writeFile(wb, 'QueenCosy_เทมเพรสอัปโหลด_PreOrder.xlsx');
+      this.toast('ดาวน์โหลดเทมเพรส Pre-Order สำเร็จ!');
+    },
+
+    // Export Tab 3 Pre-Order Report & Monthly Billing to Styled Excel
+    exportPreOrderReportExcel() {
+      if (typeof XLSX === 'undefined') {
+        this.toast('ไม่พบไลบรารี XLSX', '⚠️');
+        return;
+      }
+      const d = this.data;
+      const borderThin = {
+        top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+      };
+
+      const aoa = [
+        ['สรุปยอด Pre-Order รายวัน & คำนวณขาโซฟา 1" / เกียร์ปรับนอนอัตโนมัติ (QueenCosy)', '', '', '', '', '', '', '', ''],
+        ['รอบวันที่ Pre-Order', 'รุ่นโซฟา (หลา/ตัว)', 'รายละเอียดสีผ้าที่สั่ง (SKU: จำนวน)', 'รวมจำนวน (ตัว)', 'รวมใช้ผ้า (หลา)', 'จำนวนม้วน (÷50)', 'ขาโซฟา 1" (ขา)', 'จำนวนถุงขา (÷500)', 'เกียร์ปรับนอน (คู่ / ลัง ÷15)']
+      ];
+
+      let totalUnits = 0, totalYards = 0, totalLegs = 0, totalGears = 0;
+      (d.preOrderDailyRecords || []).forEach(rec => {
+        const entries = Object.entries(rec.colorBreakdown || {}).filter(([, q]) => Number(q || 0) > 0);
+        const sumUnits = entries.reduce((s, [, q]) => s + Number(q || 0), 0);
+        const sumYards = sumUnits * Number(rec.yardsPerUnit || 0);
+        const sumLegs = sumUnits * Number(rec.legsPerUnit || 6);
+        const sumGears = sumUnits * Number(rec.gearPerUnit || 0);
+        totalUnits += sumUnits;
+        totalYards += sumYards;
+        totalLegs += sumLegs;
+        totalGears += sumGears;
+
+        const breakdownText = entries.map(([sku, q]) => `${sku}: ${q}`).join(', ');
+        aoa.push([
+          rec.dateRange,
+          rec.modelLabel,
+          breakdownText,
+          sumUnits,
+          Math.round(sumYards * 100) / 100,
+          Math.round((sumYards / 50) * 100) / 100,
+          sumLegs,
+          Math.round((sumLegs / 500) * 100) / 100,
+          sumGears > 0 ? `${sumGears} คู่ (${(sumGears / 15).toFixed(1)} ลัง)` : '-'
+        ]);
+      });
+
+      aoa.push([
+        'รวมทั้งหมด', '', '',
+        totalUnits,
+        Math.round(totalYards * 100) / 100,
+        Math.round((totalYards / 50) * 100) / 100,
+        totalLegs,
+        Math.round((totalLegs / 500) * 100) / 100,
+        `${totalGears} คู่ (${(totalGears / 15).toFixed(1)} ลัง)`
+      ]);
+
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
+      ws['!cols'] = [
+        { wch: 20 }, { wch: 26 }, { wch: 45 }, { wch: 14 },
+        { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 16 }, { wch: 22 }
+      ];
+
+      const totalRows = aoa.length;
+      for (let r = 0; r < totalRows; r++) {
+        for (let c = 0; c <= 8; c++) {
+          const ref = XLSX.utils.encode_cell({ r, c });
+          if (!ws[ref]) continue;
+          if (r === 0) {
+            ws[ref].s = {
+              fill: { fgColor: { rgb: '1E1B4B' } },
+              font: { name: 'Tahoma', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+              alignment: { horizontal: 'left', vertical: 'center' }
+            };
+          } else if (r === 1) {
+            ws[ref].s = {
+              fill: { fgColor: { rgb: '0F172A' } },
+              font: { name: 'Tahoma', sz: 10, bold: true, color: { rgb: 'FFFFFF' } },
+              alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+              border: borderThin
+            };
+          } else if (r === totalRows - 1) {
+            ws[ref].s = {
+              fill: { fgColor: { rgb: '0F172A' } },
+              font: { name: 'Tahoma', sz: 10, bold: true, color: { rgb: 'FDE047' } },
+              alignment: { horizontal: c <= 2 ? 'left' : 'center', vertical: 'center' },
+              border: borderThin
+            };
+          } else {
+            ws[ref].s = {
+              fill: { fgColor: { rgb: c >= 6 && c <= 7 ? 'FFFBEB' : (c === 8 ? 'ECFDF5' : 'FFFFFF') } },
+              font: { name: 'Tahoma', sz: 10, bold: c === 1 || c === 3, color: { rgb: '0F172A' } },
+              alignment: { horizontal: c <= 2 ? 'left' : 'center', vertical: 'center', wrapText: c === 2 },
+              border: borderThin
+            };
+          }
+        }
+      }
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'สรุป_PreOrder_ขา_เกียร์');
+      XLSX.writeFile(wb, `QueenCosy_รีพอร์ต_PreOrder_ขาเกียร์_${new Date().toISOString().split('T')[0]}.xlsx`);
+      this.toast('ส่งออกรีพอร์ต Pre-Order (.xlsx) สำเร็จ!');
     },
 
     // -----------------------------------------------------------------------
@@ -1347,7 +2051,9 @@
       this.toast('สร้างรอบตัดผ้าใหม่ พร้อมดึงยอดผ้าคงเหลือยกมาจากรอบก่อนหน้าเรียบร้อย!');
     },
 
-    // Export Active Round to Excel (.xlsx) matching Admin's Google Sheet layout
+    // -----------------------------------------------------------------------
+    // STYLED EXCEL EXPORT MATCHING THE WEB SYSTEM UI (Sheet 1 & Sheet 2 Synced)
+    // -----------------------------------------------------------------------
     exportActiveRoundToExcel() {
       if (typeof XLSX === 'undefined') {
         this.toast('ไม่พบไลบรารี XLSX สำหรับส่งออกไฟล์', '⚠️');
@@ -1356,61 +2062,518 @@
       const round = this.getActiveRound();
       if (!round) return;
       const totals = computeRoundTotals(round);
+      const isBoon = round.formulaMode === 'BOON';
 
-      // Sheet 1: ใบเบิกผ้าคำนวณตัด
-      const aoa1 = [
-        ['เบอร์สี SKU', 'สี', 'กลุ่มผ้า', 'CS2 (3.2Y)', 'รวมหลา CS2', 'CS3 (4.33Y)', 'รวมหลา CS3', 'เฉพาะแขน (1.93Y)', 'รวมหลาแขน', 'RS หัวกระดก (6.26Y)', 'รวมหลา RS', 'LN3 กระดุม 19 เม็ด (6.21Y)', 'รวมหลา LN3', 'LN กระดุม 5 เม็ด (6.17Y)', 'รวมหลา LN5', 'PN ปรับนอน (6.65Y)', 'รวมหลา PN', 'L-Mini ซ้าย', 'L-Mini ขวา', 'รวมหลา L-Mini (8.97Y)', 'รวมเบิก (หลา)', 'จำนวนม้วน (÷50)', 'ราคา/หลา', 'รวมยอดค่าผ้า', 'หักผ้าที่มี / สั่งม้วน', 'จำนวนหลาที่ส่งจริง', 'ยอดยกมา (หลา)', 'จำนวนผ้าคงเหลือตามสูตร', 'คงเหลือจริง #ช่างนอก', 'ผ้าคงเหลือต่างกัน (ตามสูตร - #ช่างนอก)', 'หมายเหตุรีเช็ค']
+      const borderThin = {
+        top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+        right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+      };
+      const borderMediumBottom = {
+        top: { style: 'thin', color: { rgb: '94A3B8' } },
+        bottom: { style: 'medium', color: { rgb: '0F172A' } },
+        left: { style: 'thin', color: { rgb: '94A3B8' } },
+        right: { style: 'thin', color: { rgb: '94A3B8' } }
+      };
+
+      // =====================================================================
+      // SHEET 1: 1_ใบเบิกผ้า_ช่างตัด (Exact 2-Row Merged Header + Colors + Formulas)
+      // =====================================================================
+      // Columns (0 to 32 = 33 columns):
+      // 0: เบอร์สี SKU, 1: สีผ้า, 2: กลุ่มผ้า
+      // 3: CS2 ตัว, 4: CS2 หลา
+      // 5: CS3 ตัว, 6: CS3 หลา
+      // 7: แขน ตัว, 8: แขน หลา
+      // 9: RS ตัว, 10: RS หลา
+      // 11: LN3 ตัว, 12: LN3 หลา
+      // 13: LN5 ตัว, 14: LN5 หลา
+      // 15: RC ตัว, 16: RC หลา
+      // 17: L-Mini ซ้าย L, 18: L-Mini ขวา R, 19: L-Mini หลา
+      // 20: L ใหญ่ ตัว, 21: L ใหญ่ หลา
+      // 22: รวมเบิก (หลา), 23: จำนวนไม้ที่สั่ง/ม้วน (÷50), 24: ราคา/หลา, 25: รวมยอดค่าผ้า (฿)
+      // 26: หักผ้าที่มี / สั่ง+เผื่อผ้าให้ช่างตัด, 27: จำนวนหลาที่ส่งจริง, 28: ยอดยกมา คงเหลือ/หลา
+      // 29: จำนวนผ้า/หลา คงเหลือตามสูตร, 30: คงเหลือ/หลา #ช่างนอก, 31: ผ้าคงเหลือต่างกัน (หลา), 32: หมายเหตุ รีเช็ค
+
+      const titleRow1 = new Array(33).fill('');
+      titleRow1[0] = `📋 ใบเบิกผ้า & คำนวณตัดผ้าโซฟา QueenCosy — ${round.name || ''} | วันที่ส่งผ้า: ${round.sendDate || '-'} | สูตร: ${isBoon ? "P'บุญ (CS2=3.75, CS3=5.21, LN5=6.21)" : 'มาตรฐานโรงงาน'}`;
+
+      const hdrRow1 = [
+        'เบอร์สี SKU', 'สีผ้า', 'กลุ่มผ้า',
+        `CS2 2 ที่นั่ง (${isBoon ? '3.75' : '3.20'} หลา)`, '',
+        `CS3 3 ที่นั่ง (${isBoon ? '5.21' : '4.33'} หลา)`, '',
+        'เฉพาะแขน (1.93 หลา)', '',
+        'RS หัวกระดก (6.26 หลา)', '',
+        'LN3 กระดุม 19 เม็ด (6.21 หลา)', '',
+        `LN กระดุม 5 เม็ด (${isBoon ? '6.21' : '6.17'} หลา)`, '',
+        'RC/PN ปรับนอน (6.65 หลา)', '',
+        'L-Mini แอลมินิ (8.97 หลา)', '', '',
+        'L ใหญ่ (11.00 หลา)', '',
+        'รวมเบิก (หลา)', 'จำนวนไม้ที่สั่ง/ม้วน (÷50)', 'ราคา/หลา', 'รวมยอดค่าผ้า (฿)',
+        'หักผ้าที่มี / สั่ง+เผื่อผ้าให้ช่างตัด', 'จำนวนหลาที่ส่งจริง', 'ยอดยกมา คงเหลือ/หลา',
+        'จำนวนผ้า/หลา คงเหลือตามสูตร', 'คงเหลือ/หลา #ช่างนอก', 'ผ้าคงเหลือต่างกัน (หลา)\n(ตามสูตร - #ช่างนอก)', 'หมายเหตุ รีเช็ค'
       ];
 
-      (round.rows || []).forEach(r => {
+      const hdrRow2 = [
+        '', '', '',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        'ซ้าย L', 'ขวา R', 'รวมหลา',
+        'ตัว', 'รวมหลา',
+        '', '', '', '', '', '', '', '', '', '', ''
+      ];
+
+      const aoa1 = [titleRow1, hdrRow1, hdrRow2];
+
+      const yCs2 = isBoon ? 3.75 : 3.20;
+      const yCs3 = isBoon ? 5.21 : 4.33;
+      const yArm = 1.93;
+      const yRs = 6.26;
+      const yLn3 = 6.21;
+      const yLn5 = isBoon ? 6.21 : 6.17;
+      const yRc = 6.65;
+      const yLmini = 8.97;
+      const yLbig = 11.00;
+
+      const rows = round.rows || [];
+      rows.forEach((r, idx) => {
+        const excelRow = idx + 4; // 1-based Excel row (rows 1=title, 2=hdr1, 3=hdr2, 4..25=data)
         const m = computeRowMetrics(r, round.formulaMode);
+        const actualNum = parseFloat(String(r.actualCutterRemnant || '').replace(/[^0-9.-]/g, ''));
+        const actualCellVal = !isNaN(actualNum) ? actualNum : (r.actualCutterRemnant || 0);
+
         aoa1.push([
-          r.sku, r.color, r.group,
-          r.cs2 || 0, m.modelYards.cs2,
-          r.cs3 || 0, m.modelYards.cs3,
-          r.arm || 0, m.modelYards.arm,
-          r.rs || 0, m.modelYards.rs,
-          r.ln3 || 0, m.modelYards.ln3,
-          r.ln5 || 0, m.modelYards.ln5,
-          r.rc || 0, m.modelYards.rc,
-          r.lminiL || 0, r.lminiR || 0, m.modelYards.lmini,
-          m.totalUsedYards, m.calcRolls, r.price, m.fabricCost,
-          r.orderRollsText || '', r.sentYards || 0, r.carriedYards || 0,
-          m.expectedRemnantYards, r.actualCutterRemnant || '', m.diffRemnantYards, r.note || ''
+          r.sku,
+          r.color,
+          r.group,
+          Number(r.cs2 || 0), { t: 'n', f: `D${excelRow}*${yCs2}`, v: m.modelYards.cs2 },
+          Number(r.cs3 || 0), { t: 'n', f: `F${excelRow}*${yCs3}`, v: m.modelYards.cs3 },
+          Number(r.arm || 0), { t: 'n', f: `H${excelRow}*${yArm}`, v: m.modelYards.arm },
+          Number(r.rs || 0),  { t: 'n', f: `J${excelRow}*${yRs}`,  v: m.modelYards.rs },
+          Number(r.ln3 || 0), { t: 'n', f: `L${excelRow}*${yLn3}`, v: m.modelYards.ln3 },
+          Number(r.ln5 || 0), { t: 'n', f: `N${excelRow}*${yLn5}`, v: m.modelYards.ln5 },
+          Number(r.rc || 0),  { t: 'n', f: `P${excelRow}*${yRc}`,  v: m.modelYards.rc },
+          Number(r.lminiL || 0), Number(r.lminiR || 0), { t: 'n', f: `(R${excelRow}+S${excelRow})*${yLmini}`, v: m.modelYards.lmini },
+          Number(r.lbig || 0), { t: 'n', f: `U${excelRow}*${yLbig}`, v: m.modelYards.lbig },
+          { t: 'n', f: `E${excelRow}+G${excelRow}+I${excelRow}+K${excelRow}+M${excelRow}+O${excelRow}+Q${excelRow}+T${excelRow}+V${excelRow}`, v: m.totalUsedYards },
+          { t: 'n', f: `W${excelRow}/50`, v: m.calcRolls },
+          Number(r.price || 0),
+          { t: 'n', f: `W${excelRow}*Y${excelRow}`, v: m.fabricCost },
+          r.orderRollsText || '',
+          Number(r.sentYards || 0),
+          Number(r.carriedYards || 0),
+          { t: 'n', f: `(AB${excelRow}+AC${excelRow})-W${excelRow}`, v: m.expectedRemnantYards },
+          actualCellVal,
+          { t: 'n', f: `AD${excelRow}-N(AE${excelRow})`, v: m.diffRemnantYards },
+          r.note || ''
         ]);
       });
 
+      const firstDataRow = 4;
+      const lastDataRow = 3 + rows.length;
+      const sumRow1 = lastDataRow + 1;
+      const wageRateRow = lastDataRow + 2;
+      const wageSumRow = lastDataRow + 3;
+
+      // Footer Row 1: รวมจำนวนผลิต / ชุด
       aoa1.push([
-        'รวมจำนวนผลิต/ชุด', '', '',
-        totals.modelQtyTotals.cs2, '',
-        totals.modelQtyTotals.cs3, '',
-        totals.modelQtyTotals.arm, '',
-        totals.modelQtyTotals.rs, '',
-        totals.modelQtyTotals.ln3, '',
-        totals.modelQtyTotals.ln5, '',
-        totals.modelQtyTotals.rc, '',
-        totals.totalLMiniL, totals.totalLMiniR, '',
-        totals.grandTotalUsedYards, totals.grandTotalCalcRolls, 'ราคารวมค่าผ้า:', totals.grandTotalFabricCost,
-        'รวมค่าแรงตัด:', totals.grandTotalCutWage, 'รวมคงเหลือตามสูตร:', totals.grandTotalExpectedRemnant, totals.grandTotalActualCutterRemnant, totals.grandTotalDiffRemnant, `รวม ${totals.grandTotalUnits} ชุด`
+        `รวมจำนวนผลิต / ชุด (รวม ${totals.grandTotalUnits} ชุด)`, '', '',
+        { t: 'n', f: `SUM(D${firstDataRow}:D${lastDataRow})`, v: totals.modelQtyTotals.cs2 },
+        { t: 'n', f: `SUM(E${firstDataRow}:E${lastDataRow})`, v: totals.modelYardsTotals.cs2 },
+        { t: 'n', f: `SUM(F${firstDataRow}:F${lastDataRow})`, v: totals.modelQtyTotals.cs3 },
+        { t: 'n', f: `SUM(G${firstDataRow}:G${lastDataRow})`, v: totals.modelYardsTotals.cs3 },
+        { t: 'n', f: `SUM(H${firstDataRow}:H${lastDataRow})`, v: totals.modelQtyTotals.arm },
+        { t: 'n', f: `SUM(I${firstDataRow}:I${lastDataRow})`, v: totals.modelYardsTotals.arm },
+        { t: 'n', f: `SUM(J${firstDataRow}:J${lastDataRow})`, v: totals.modelQtyTotals.rs },
+        { t: 'n', f: `SUM(K${firstDataRow}:K${lastDataRow})`, v: totals.modelYardsTotals.rs },
+        { t: 'n', f: `SUM(L${firstDataRow}:L${lastDataRow})`, v: totals.modelQtyTotals.ln3 },
+        { t: 'n', f: `SUM(M${firstDataRow}:M${lastDataRow})`, v: totals.modelYardsTotals.ln3 },
+        { t: 'n', f: `SUM(N${firstDataRow}:N${lastDataRow})`, v: totals.modelQtyTotals.ln5 },
+        { t: 'n', f: `SUM(O${firstDataRow}:O${lastDataRow})`, v: totals.modelYardsTotals.ln5 },
+        { t: 'n', f: `SUM(P${firstDataRow}:P${lastDataRow})`, v: totals.modelQtyTotals.rc },
+        { t: 'n', f: `SUM(Q${firstDataRow}:Q${lastDataRow})`, v: totals.modelYardsTotals.rc },
+        { t: 'n', f: `SUM(R${firstDataRow}:R${lastDataRow})`, v: totals.totalLMiniL },
+        { t: 'n', f: `SUM(S${firstDataRow}:S${lastDataRow})`, v: totals.totalLMiniR },
+        { t: 'n', f: `SUM(T${firstDataRow}:T${lastDataRow})`, v: totals.modelYardsTotals.lmini },
+        { t: 'n', f: `SUM(U${firstDataRow}:U${lastDataRow})`, v: totals.modelQtyTotals.lbig },
+        { t: 'n', f: `SUM(V${firstDataRow}:V${lastDataRow})`, v: totals.modelYardsTotals.lbig },
+        { t: 'n', f: `SUM(W${firstDataRow}:W${lastDataRow})`, v: totals.grandTotalUsedYards },
+        { t: 'n', f: `SUM(X${firstDataRow}:X${lastDataRow})`, v: totals.grandTotalCalcRolls },
+        'รวมค่าผ้า:',
+        { t: 'n', f: `SUM(Z${firstDataRow}:Z${lastDataRow})`, v: totals.grandTotalFabricCost },
+        'ส่งจริง/ยกมา:',
+        { t: 'n', f: `SUM(AB${firstDataRow}:AB${lastDataRow})`, v: totals.grandTotalSentYards },
+        { t: 'n', f: `SUM(AC${firstDataRow}:AC${lastDataRow})`, v: totals.grandTotalCarriedYards },
+        { t: 'n', f: `SUM(AD${firstDataRow}:AD${lastDataRow})`, v: totals.grandTotalExpectedRemnant },
+        { t: 'n', f: `SUM(AE${firstDataRow}:AE${lastDataRow})`, v: totals.grandTotalActualCutterRemnant },
+        { t: 'n', f: `SUM(AF${firstDataRow}:AF${lastDataRow})`, v: totals.grandTotalDiffRemnant },
+        ''
       ]);
 
-      // Sheet 2: ใบสั่งตัดนอก (แยก L-mini ซ้าย/ขวา)
-      const aoa2 = [
-        ['รุ่นกลุ่มผ้า', 'เบอร์สี SKU', 'สี', 'จำนวนการส่งไม้', '2 PL', '3 PL', 'แขน New', 'กระดก', 'กระดุม 19 เม็ด', 'กระดุม 5 เม็ด', 'ปรับนอน', 'L-mini ซ้าย', 'L-mini ขวา', 'หมายเหตุสั่งช่าง']
+      // Footer Row 2: ราคาค่าแรงตัด / ตัว (บาท)
+      aoa1.push([
+        'ราคาค่าแรงตัด / ตัว (บาท)', '', '',
+        45, '', 55, '', 20, '', 70, '', 80, '', 70, '', 70, '', 90, 90, '', 100, '',
+        '', '', '', '', '', '', '', '', '', '', ''
+      ]);
+
+      // Footer Row 3: ราคารวมค่าแรงตัดแยกตามรุ่น (บาท)
+      aoa1.push([
+        'ราคารวมค่าแรงตัดแยกตามรุ่น (บาท)', '', '',
+        { t: 'n', f: `D${sumRow1}*D${wageRateRow}`, v: totals.modelCutWageTotals.cs2 }, '',
+        { t: 'n', f: `F${sumRow1}*F${wageRateRow}`, v: totals.modelCutWageTotals.cs3 }, '',
+        { t: 'n', f: `H${sumRow1}*H${wageRateRow}`, v: totals.modelCutWageTotals.arm }, '',
+        { t: 'n', f: `J${sumRow1}*J${wageRateRow}`, v: totals.modelCutWageTotals.rs }, '',
+        { t: 'n', f: `L${sumRow1}*L${wageRateRow}`, v: totals.modelCutWageTotals.ln3 }, '',
+        { t: 'n', f: `N${sumRow1}*N${wageRateRow}`, v: totals.modelCutWageTotals.ln5 }, '',
+        { t: 'n', f: `P${sumRow1}*P${wageRateRow}`, v: totals.modelCutWageTotals.rc }, '',
+        { t: 'n', f: `(R${sumRow1}+S${sumRow1})*R${wageRateRow}`, v: totals.modelCutWageTotals.lmini }, '', '',
+        { t: 'n', f: `U${sumRow1}*U${wageRateRow}`, v: totals.modelCutWageTotals.lbig }, '',
+        'รวมค่าแรงตัดทั้งสิ้น:',
+        { t: 'n', f: `D${wageSumRow}+F${wageSumRow}+H${wageSumRow}+J${wageSumRow}+L${wageSumRow}+N${wageSumRow}+P${wageSumRow}+R${wageSumRow}+U${wageSumRow}`, v: totals.grandTotalCutWage },
+        '', '', '', '', '', '', '', '', ''
+      ]);
+
+      const ws1 = XLSX.utils.aoa_to_sheet(aoa1);
+
+      // Merged cells for Sheet 1 matching the web system's 2-row table header
+      ws1['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 32 } }, // Title banner
+        { s: { r: 1, c: 0 }, e: { r: 2, c: 0 } },  // เบอร์สี SKU
+        { s: { r: 1, c: 1 }, e: { r: 2, c: 1 } },  // สีผ้า
+        { s: { r: 1, c: 2 }, e: { r: 2, c: 2 } },  // กลุ่มผ้า
+        { s: { r: 1, c: 3 }, e: { r: 1, c: 4 } },  // CS2
+        { s: { r: 1, c: 5 }, e: { r: 1, c: 6 } },  // CS3
+        { s: { r: 1, c: 7 }, e: { r: 1, c: 8 } },  // แขน
+        { s: { r: 1, c: 9 }, e: { r: 1, c: 10 } }, // RS
+        { s: { r: 1, c: 11 }, e: { r: 1, c: 12 } }, // LN3
+        { s: { r: 1, c: 13 }, e: { r: 1, c: 14 } }, // LN5
+        { s: { r: 1, c: 15 }, e: { r: 1, c: 16 } }, // RC
+        { s: { r: 1, c: 17 }, e: { r: 1, c: 19 } }, // L-Mini (ซ้าย L, ขวา R, รวมหลา)
+        { s: { r: 1, c: 20 }, e: { r: 1, c: 21 } }, // L ใหญ่
+        { s: { r: 1, c: 22 }, e: { r: 2, c: 22 } }, // รวมเบิก (หลา)
+        { s: { r: 1, c: 23 }, e: { r: 2, c: 23 } }, // จำนวนไม้ที่สั่ง/ม้วน
+        { s: { r: 1, c: 24 }, e: { r: 2, c: 24 } }, // ราคา/หลา
+        { s: { r: 1, c: 25 }, e: { r: 2, c: 25 } }, // รวมยอดค่าผ้า
+        { s: { r: 1, c: 26 }, e: { r: 2, c: 26 } }, // หักผ้าที่มี / สั่งม้วน
+        { s: { r: 1, c: 27 }, e: { r: 2, c: 27 } }, // จำนวนหลาที่ส่งจริง
+        { s: { r: 1, c: 28 }, e: { r: 2, c: 28 } }, // ยอดยกมา
+        { s: { r: 1, c: 29 }, e: { r: 2, c: 29 } }, // คงเหลือตามสูตร
+        { s: { r: 1, c: 30 }, e: { r: 2, c: 30 } }, // คงเหลือ #ช่างนอก
+        { s: { r: 1, c: 31 }, e: { r: 2, c: 31 } }, // ผ้าคงเหลือต่างกัน
+        { s: { r: 1, c: 32 }, e: { r: 2, c: 32 } }, // หมายเหตุ
+        { s: { r: sumRow1 - 1, c: 0 }, e: { r: sumRow1 - 1, c: 2 } },
+        { s: { r: wageRateRow - 1, c: 0 }, e: { r: wageRateRow - 1, c: 2 } },
+        { s: { r: wageSumRow - 1, c: 0 }, e: { r: wageSumRow - 1, c: 2 } }
       ];
-      (round.rows || []).forEach(r => {
+
+      ws1['!cols'] = [
+        { wch: 15 }, { wch: 13 }, { wch: 11 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 7 }, { wch: 9 },
+        { wch: 7 }, { wch: 9 },
+        { wch: 13 }, { wch: 14 }, { wch: 10 }, { wch: 15 },
+        { wch: 22 }, { wch: 15 }, { wch: 15 }, { wch: 16 },
+        { wch: 16 }, { wch: 18 }, { wch: 16 }
+      ];
+
+      // Apply visual styles to Sheet 1
+      const totalSheet1Rows = aoa1.length;
+      for (let r = 0; r < totalSheet1Rows; r++) {
+        for (let c = 0; c <= 32; c++) {
+          const ref = XLSX.utils.encode_cell({ r, c });
+          if (!ws1[ref]) ws1[ref] = { t: 's', v: '' };
+
+          if (r === 0) {
+            ws1[ref].s = {
+              fill: { fgColor: { rgb: '1E1B4B' } },
+              font: { name: 'Tahoma', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+              alignment: { horizontal: 'left', vertical: 'center' }
+            };
+          } else if (r === 1 || r === 2) {
+            let hdrBg = '0F172A';
+            let hdrFg = 'FFFFFF';
+            if (c >= 3 && c <= 16) hdrBg = '1E1B4B';
+            else if (c >= 17 && c <= 19) { hdrBg = '4A044E'; hdrFg = 'F5D0FE'; }
+            else if (c >= 20 && c <= 21) hdrBg = '1E1B4B';
+            else if (c === 22) { hdrBg = '312E81'; hdrFg = 'FDE047'; }
+            else if (c === 23) { hdrBg = '701A75'; hdrFg = 'F5D0FE'; }
+            else if (c === 26 || c === 30) { hdrBg = '78350F'; hdrFg = 'FDE68A'; }
+            else if (c === 27 || c === 29) { hdrBg = '064E3B'; hdrFg = 'A7F3D0'; }
+            else if (c === 31) { hdrBg = '881337'; hdrFg = 'FECDD3'; }
+
+            ws1[ref].s = {
+              fill: { fgColor: { rgb: hdrBg } },
+              font: { name: 'Tahoma', sz: 9, bold: true, color: { rgb: hdrFg } },
+              alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+              border: borderMediumBottom
+            };
+          } else if (r >= 3 && r < 3 + rows.length) {
+            const rowObj = rows[r - 3];
+            const m = computeRowMetrics(rowObj, round.formulaMode);
+            const groupRgb =
+              rowObj.group === 'PVC หนัง' ? 'FFFBEB' :
+              rowObj.group === 'ลูกฟูก' ? 'ECFDF5' :
+              rowObj.group === 'Hollan' ? 'F0F9FF' : 'FAF5FF';
+
+            let cellBg = groupRgb;
+            let fontColor = '0F172A';
+            let isBold = false;
+            let numFmt = undefined;
+            let align = 'center';
+
+            if (c <= 2) {
+              align = c === 2 ? 'center' : 'left';
+              isBold = c === 0 || c === 1;
+            } else if ([3, 5, 7, 9, 11, 13, 15, 17, 18, 20].includes(c)) {
+              const val = Number(ws1[ref].v || 0);
+              cellBg = val > 0 ? (c === 17 || c === 18 ? 'FDF4FF' : 'EEF2FF') : 'FFFFFF';
+              fontColor = val > 0 ? (c === 17 || c === 18 ? '86198F' : '312E81') : '94A3B8';
+              isBold = val > 0;
+              numFmt = '#,##0';
+            } else if ([4, 6, 8, 10, 12, 14, 16, 19, 21].includes(c)) {
+              cellBg = 'F8FAFC';
+              fontColor = '475569';
+              numFmt = '#,##0.00';
+              align = 'right';
+            } else if (c === 22) {
+              cellBg = 'EEF2FF';
+              fontColor = '1E1B4B';
+              isBold = true;
+              numFmt = '#,##0.00';
+              align = 'right';
+            } else if (c === 23) {
+              cellBg = 'FDF4FF';
+              fontColor = '86198F';
+              isBold = true;
+              numFmt = '#,##0.0';
+              align = 'right';
+            } else if (c === 24) {
+              numFmt = '#,##0';
+              align = 'right';
+            } else if (c === 25) {
+              numFmt = '#,##0.00';
+              align = 'right';
+              isBold = true;
+            } else if (c === 26) {
+              cellBg = 'FFFBEB';
+              fontColor = '92400E';
+              isBold = true;
+            } else if (c === 27) {
+              cellBg = 'ECFDF5';
+              fontColor = '065F46';
+              isBold = true;
+              numFmt = '#,##0.00';
+              align = 'right';
+            } else if (c === 28) {
+              numFmt = '#,##0.00';
+              align = 'right';
+            } else if (c === 29) {
+              cellBg = m.expectedRemnantYards < 0 ? 'FFE4E6' : 'ECFDF5';
+              fontColor = m.expectedRemnantYards < 0 ? 'BE123C' : '047857';
+              isBold = true;
+              numFmt = '#,##0.00';
+              align = 'right';
+            } else if (c === 30) {
+              cellBg = 'FFFBEB';
+              fontColor = '92400E';
+              isBold = true;
+              align = 'right';
+            } else if (c === 31) {
+              cellBg = Math.abs(m.diffRemnantYards) > 0.05 ? 'FFF1F2' : 'F8FAFC';
+              fontColor = m.diffRemnantYards > 0.05 ? 'BE123C' : (m.diffRemnantYards < -0.05 ? '1D4ED8' : '475569');
+              isBold = true;
+              numFmt = '#,##0.00';
+              align = 'right';
+            }
+
+            ws1[ref].s = {
+              fill: { fgColor: { rgb: cellBg } },
+              font: { name: 'Tahoma', sz: 9.5, bold: isBold, color: { rgb: fontColor } },
+              alignment: { horizontal: align, vertical: 'center' },
+              border: borderThin,
+              ...(numFmt ? { numFmt } : {})
+            };
+          } else {
+            // Footer rows
+            const isSumRow = r === sumRow1 - 1;
+            const isWageRate = r === wageRateRow - 1;
+            const bgRgb = isSumRow ? '0F172A' : (isWageRate ? 'FFFBEB' : 'ECFDF5');
+            const fgRgb = isSumRow ? 'FDE047' : (isWageRate ? '92400E' : '065F46');
+            ws1[ref].s = {
+              fill: { fgColor: { rgb: bgRgb } },
+              font: { name: 'Tahoma', sz: 9.5, bold: true, color: { rgb: fgRgb } },
+              alignment: { horizontal: c <= 2 ? 'left' : 'center', vertical: 'center' },
+              border: borderThin,
+              numFmt: '#,##0.##'
+            };
+          }
+        }
+      }
+
+      // =====================================================================
+      // SHEET 2: 2_ใบสั่งตัดนอก (Visual Match to View 2 + Formula Synced to Sheet 1)
+      // =====================================================================
+      // Columns (0 to 15 = 16 columns):
+      // 0: กลุ่มผ้า, 1: เบอร์สี SKU, 2: สี, 3: จำนวนการส่งไม้ (ม้วน / ใช้ผ้าที่มี)
+      // 4: 2 PL, 5: 3 PL, 6: แขน New, 7: กระดก, 8: กระดุม 19 เม็ด, 9: กระดุม 5 เม็ด, 10: ปรับนอน
+      // 11: L-mini ซ้าย (L), 12: L-mini ขวา (R), 13: L ใหญ่, 14: รวมชุดสั่งตัด, 15: หมายเหตุสั่งช่างนอก
+
+      const s1Name = '1_ใบเบิกผ้า_ช่างตัด';
+      const titleRow2 = new Array(16).fill('');
+      titleRow2[0] = `✂️ ใบสั่งผลิตส่งช่างตัดนอก (แยก L-mini ซ้าย/ขวา • ซิงค์ยอดสั่งตัดอัตโนมัติกับชีท 1) — ${round.name || ''} | วันที่ส่งผ้า: ${round.sendDate || '-'}`;
+
+      const outHdr1 = [
+        'กลุ่มผ้า', 'เบอร์สี SKU', 'สีผ้า', 'จำนวนการส่งไม้\n(ม้วน / ใช้ผ้าที่มี)',
+        '2 PL', '3 PL', 'แขน New', 'กระดก', 'กระดุม 19 เม็ด', 'กระดุม 5 เม็ด', 'ปรับนอน',
+        'L-Mini (แยกซ้าย-ขวา)', '', 'L ใหญ่', 'รวมชุดสั่งตัด', 'หมายเหตุสั่งช่างนอก'
+      ];
+      const outHdr2 = [
+        '', '', '', '',
+        'Order', 'Order', 'Order', 'Order', 'Order', 'Order', 'Order',
+        'ซ้าย (L)', 'ขวา (R)', 'Order', 'รวม (ชุด)', ''
+      ];
+
+      const aoa2 = [titleRow2, outHdr1, outHdr2];
+
+      rows.forEach((r, idx) => {
+        const s1Row = idx + 4; // matching row in Sheet 1
+        const s2Row = idx + 4; // current row in Sheet 2
+        const m = computeRowMetrics(r, round.formulaMode);
         aoa2.push([
-          r.group, r.sku, r.color, r.orderRollsText || '',
-          r.cs2 || '', r.cs3 || '', r.arm || '', r.rs || '', r.ln3 || '', r.ln5 || '', r.rc || '',
-          r.lminiL || '', r.lminiR || '', r.outsourceNote || ''
+          r.group,
+          r.sku,
+          r.color,
+          { t: 's', f: `'${s1Name}'!AA${s1Row}`, v: r.orderRollsText || '' },
+          { t: 'n', f: `'${s1Name}'!D${s1Row}`, v: Number(r.cs2 || 0) },
+          { t: 'n', f: `'${s1Name}'!F${s1Row}`, v: Number(r.cs3 || 0) },
+          { t: 'n', f: `'${s1Name}'!H${s1Row}`, v: Number(r.arm || 0) },
+          { t: 'n', f: `'${s1Name}'!J${s1Row}`, v: Number(r.rs || 0) },
+          { t: 'n', f: `'${s1Name}'!L${s1Row}`, v: Number(r.ln3 || 0) },
+          { t: 'n', f: `'${s1Name}'!N${s1Row}`, v: Number(r.ln5 || 0) },
+          { t: 'n', f: `'${s1Name}'!P${s1Row}`, v: Number(r.rc || 0) },
+          { t: 'n', f: `'${s1Name}'!R${s1Row}`, v: Number(r.lminiL || 0) },
+          { t: 'n', f: `'${s1Name}'!S${s1Row}`, v: Number(r.lminiR || 0) },
+          { t: 'n', f: `'${s1Name}'!U${s1Row}`, v: Number(r.lbig || 0) },
+          { t: 'n', f: `SUM(E${s2Row}:N${s2Row})`, v: m.totalUnits },
+          r.outsourceNote || ''
         ]);
       });
 
+      aoa2.push([
+        `รวมจำนวนตัดทุกรุ่น (ชุด)`, '', '',
+        `≈ ${this.fmt(totals.grandTotalCalcRolls, 1)} ม้วน`,
+        { t: 'n', f: `SUM(E${firstDataRow}:E${lastDataRow})`, v: totals.modelQtyTotals.cs2 },
+        { t: 'n', f: `SUM(F${firstDataRow}:F${lastDataRow})`, v: totals.modelQtyTotals.cs3 },
+        { t: 'n', f: `SUM(G${firstDataRow}:G${lastDataRow})`, v: totals.modelQtyTotals.arm },
+        { t: 'n', f: `SUM(H${firstDataRow}:H${lastDataRow})`, v: totals.modelQtyTotals.rs },
+        { t: 'n', f: `SUM(I${firstDataRow}:I${lastDataRow})`, v: totals.modelQtyTotals.ln3 },
+        { t: 'n', f: `SUM(J${firstDataRow}:J${lastDataRow})`, v: totals.modelQtyTotals.ln5 },
+        { t: 'n', f: `SUM(K${firstDataRow}:K${lastDataRow})`, v: totals.modelQtyTotals.rc },
+        { t: 'n', f: `SUM(L${firstDataRow}:L${lastDataRow})`, v: totals.totalLMiniL },
+        { t: 'n', f: `SUM(M${firstDataRow}:M${lastDataRow})`, v: totals.totalLMiniR },
+        { t: 'n', f: `SUM(N${firstDataRow}:N${lastDataRow})`, v: totals.modelQtyTotals.lbig },
+        { t: 'n', f: `SUM(O${firstDataRow}:O${lastDataRow})`, v: totals.grandTotalUnits },
+        `ค่าแรงตัดรวม: ฿${this.fmt(totals.grandTotalCutWage, 2)}`
+      ]);
+
+      const ws2 = XLSX.utils.aoa_to_sheet(aoa2);
+      ws2['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 15 } },
+        { s: { r: 1, c: 0 }, e: { r: 2, c: 0 } },
+        { s: { r: 1, c: 1 }, e: { r: 2, c: 1 } },
+        { s: { r: 1, c: 2 }, e: { r: 2, c: 2 } },
+        { s: { r: 1, c: 3 }, e: { r: 2, c: 3 } },
+        { s: { r: 1, c: 11 }, e: { r: 1, c: 12 } }, // L-Mini header span
+        { s: { r: 1, c: 15 }, e: { r: 2, c: 15 } },
+        { s: { r: sumRow1 - 1, c: 0 }, e: { r: sumRow1 - 1, c: 2 } }
+      ];
+
+      ws2['!cols'] = [
+        { wch: 12 }, { wch: 15 }, { wch: 13 }, { wch: 20 },
+        { wch: 9 }, { wch: 9 }, { wch: 10 }, { wch: 9 }, { wch: 14 }, { wch: 14 }, { wch: 10 },
+        { wch: 11 }, { wch: 11 }, { wch: 9 }, { wch: 13 }, { wch: 28 }
+      ];
+
+      const totalSheet2Rows = aoa2.length;
+      for (let r = 0; r < totalSheet2Rows; r++) {
+        for (let c = 0; c <= 15; c++) {
+          const ref = XLSX.utils.encode_cell({ r, c });
+          if (!ws2[ref]) ws2[ref] = { t: 's', v: '' };
+
+          if (r === 0) {
+            ws2[ref].s = {
+              fill: { fgColor: { rgb: '4A044E' } },
+              font: { name: 'Tahoma', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+              alignment: { horizontal: 'left', vertical: 'center' }
+            };
+          } else if (r === 1 || r === 2) {
+            const bg = c === 3 ? '78350F' : ((c === 11 || c === 12) ? '701A75' : (c === 14 ? '064E3B' : '0F172A'));
+            ws2[ref].s = {
+              fill: { fgColor: { rgb: bg } },
+              font: { name: 'Tahoma', sz: 9.5, bold: true, color: { rgb: 'FFFFFF' } },
+              alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+              border: borderMediumBottom
+            };
+          } else if (r >= 3 && r < 3 + rows.length) {
+            const rowObj = rows[r - 3];
+            const groupRgb =
+              rowObj.group === 'PVC หนัง' ? 'FFFBEB' :
+              rowObj.group === 'ลูกฟูก' ? 'ECFDF5' :
+              rowObj.group === 'Hollan' ? 'F0F9FF' : 'FAF5FF';
+            const val = Number(ws2[ref].v || 0);
+            let bg = groupRgb;
+            let fg = '0F172A';
+            let bold = c <= 2;
+
+            if (c === 3) {
+              bg = 'FFFBEB';
+              fg = '92400E';
+              bold = true;
+            } else if (c >= 4 && c <= 13) {
+              bg = val > 0 ? ((c === 11 || c === 12) ? 'FDF4FF' : 'EEF2FF') : 'FFFFFF';
+              fg = val > 0 ? ((c === 11 || c === 12) ? '86198F' : '312E81') : 'CBD5E1';
+              bold = val > 0;
+            } else if (c === 14) {
+              bg = val > 0 ? 'D1FAE5' : 'F8FAFC';
+              fg = val > 0 ? '065F46' : '94A3B8';
+              bold = true;
+            }
+
+            ws2[ref].s = {
+              fill: { fgColor: { rgb: bg } },
+              font: { name: 'Tahoma', sz: 10, bold, color: { rgb: fg } },
+              alignment: { horizontal: c <= 2 || c === 15 ? 'left' : 'center', vertical: 'center' },
+              border: borderThin,
+              ...(c >= 4 && c <= 14 ? { numFmt: '#,##0;-#,##0;""' } : {})
+            };
+          } else {
+            ws2[ref].s = {
+              fill: { fgColor: { rgb: '0F172A' } },
+              font: { name: 'Tahoma', sz: 10, bold: true, color: { rgb: 'FDE047' } },
+              alignment: { horizontal: c <= 2 ? 'left' : 'center', vertical: 'center' },
+              border: borderThin
+            };
+          }
+        }
+      }
+
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa1), 'ใบเบิกผ้า_คำนวณตัด');
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa2), 'ใบสั่งตัดนอก');
+      XLSX.utils.book_append_sheet(wb, ws1, s1Name);
+      XLSX.utils.book_append_sheet(wb, ws2, '2_ใบสั่งตัดนอก');
       XLSX.writeFile(wb, `QueenCosy_ใบเบิกผ้าและสั่งตัดนอก_${round.calcDate || 'export'}.xlsx`);
-      this.toast('ส่งออกไฟล์ Excel (ใบเบิกผ้า + ใบสั่งตัดนอก) สำเร็จ!');
+      this.toast('ส่งออกไฟล์ Excel แบบตารางสีเหมือนหน้าระบบ (ซิงค์ชีท 1 & ชีท 2) สำเร็จ!');
     },
 
     bindEvents() {
@@ -1451,7 +2614,7 @@
         this.renderMatrixTab();
       });
 
-      // Action buttons in Tab 1
+      // Action buttons in Tab 1 & View 2
       document.getElementById('btn-routine-new-round')?.addEventListener('click', () => {
         this.createNewRoundFromCurrent();
       });
@@ -1463,6 +2626,12 @@
       });
       document.getElementById('btn-routine-export-excel')?.addEventListener('click', () => {
         this.exportActiveRoundToExcel();
+      });
+      document.getElementById('btn-outsource-export-excel')?.addEventListener('click', () => {
+        this.exportActiveRoundToExcel();
+      });
+      document.getElementById('btn-outsource-autofill-rolls')?.addEventListener('click', () => {
+        this.autoFillOutsourceRolls();
       });
 
       // Filters in Cut-Sew Stock Tab (Tab 2)
@@ -1476,6 +2645,88 @@
       });
       document.getElementById('btn-push-all-shortages-tab2')?.addEventListener('click', () => {
         this.pushAllShortagesToActiveRound();
+      });
+
+      // Tab 3: Pre-Order Drag & Drop / File Input / Template / Export / Push / Manual Add
+      const dropzone = document.getElementById('preorder-dropzone');
+      const fileInput = document.getElementById('preorder-file-input');
+      if (dropzone && fileInput) {
+        dropzone.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'LABEL') return;
+          fileInput.click();
+        });
+        dropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropzone.classList.add('border-indigo-600', 'bg-indigo-100/70');
+        });
+        dropzone.addEventListener('dragleave', () => {
+          dropzone.classList.remove('border-indigo-600', 'bg-indigo-100/70');
+        });
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('border-indigo-600', 'bg-indigo-100/70');
+          if (e.dataTransfer?.files?.length) {
+            this.handlePreOrderFilesUpload(e.dataTransfer.files);
+          }
+        });
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files?.length) {
+            this.handlePreOrderFilesUpload(e.target.files);
+            e.target.value = '';
+          }
+        });
+      }
+
+      document.getElementById('btn-preorder-download-template')?.addEventListener('click', () => {
+        this.downloadPreOrderTemplateExcel();
+      });
+      document.getElementById('btn-preorder-push-to-tab1')?.addEventListener('click', () => {
+        this.pushPreOrderRecordsToTab1AndTab2();
+      });
+      document.getElementById('btn-preorder-export-excel')?.addEventListener('click', () => {
+        this.exportPreOrderReportExcel();
+      });
+      document.getElementById('btn-preorder-clear-all')?.addEventListener('click', () => {
+        this.data.preOrderDailyRecords = [];
+        this.save();
+        this.renderPreOrderAndBillingTab();
+        this.toast('ล้างตาราง Pre-Order เรียบร้อย พร้อมรับไฟล์อัปโหลดชุดใหม่!');
+      });
+
+      document.getElementById('form-add-preorder-manual')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const modelKey = document.getElementById('po-manual-model')?.value || 'cs3';
+        const sku = document.getElementById('po-manual-sku')?.value || 'PQ002C-06';
+        const qty = Number(document.getElementById('po-manual-qty')?.value || 1);
+        const lr = document.getElementById('po-manual-lr')?.value || 'NONE';
+        const dateLabel = (document.getElementById('preorder-upload-date-label')?.value || '').trim() || 'เพิ่มรายการด่วน';
+        if (qty <= 0) return;
+
+        const meta = this.getModelMeta(modelKey);
+        let rec = (this.data.preOrderDailyRecords || []).find(r => r.dateRange === dateLabel && (r.modelKey === modelKey || r.modelLabel === meta.modelLabel));
+        if (!rec) {
+          rec = {
+            dateRange: dateLabel,
+            modelKey: meta.modelKey,
+            modelLabel: meta.modelLabel,
+            yardsPerUnit: meta.yardsPerUnit,
+            legsPerUnit: meta.legsPerUnit,
+            gearPerUnit: meta.gearPerUnit,
+            colorBreakdown: {},
+            lminiLR: {}
+          };
+          this.data.preOrderDailyRecords.unshift(rec);
+        }
+        rec.colorBreakdown[sku] = Number(rec.colorBreakdown[sku] || 0) + qty;
+        if (modelKey === 'lmini') {
+          rec.lminiLR = rec.lminiLR || {};
+          if (!rec.lminiLR[sku]) rec.lminiLR[sku] = { L: 0, R: 0 };
+          if (lr === 'R') rec.lminiLR[sku].R += qty;
+          else rec.lminiLR[sku].L += qty;
+        }
+        this.save();
+        this.renderPreOrderAndBillingTab();
+        this.toast(`เพิ่ม Pre-Order ${meta.modelLabel} (${sku} +${qty} ตัว) เรียบร้อย!`);
       });
 
       // Add new Spare Part form in Tab 3
