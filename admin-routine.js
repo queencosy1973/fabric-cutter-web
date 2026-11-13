@@ -359,6 +359,12 @@
   // =========================================================================
   // 3. CALCULATION HELPERS FOR ADMIN ROUTINE MATRIX
   // =========================================================================
+  function parseCutterRemnantNumeric(val) {
+    if (val === undefined || val === null || val === '') return 0;
+    const match = String(val).match(/-?\d+(\.\d+)?/);
+    return match ? parseFloat(match[0]) : 0;
+  }
+
   function computeRowMetrics(row, formulaMode = 'STANDARD') {
     const lminiTotal = Number(row.lminiL || 0) + Number(row.lminiR || 0) || Number(row.lmini || 0);
     const modelYards = {};
@@ -389,6 +395,9 @@
     const sentYards = Number(row.sentYards || 0);
     const carriedYards = Number(row.carriedYards || 0);
     const expectedRemnantYards = Math.round((sentYards + carriedYards - totalUsedYards) * 100) / 100;
+    const actualCutterNumeric = Math.round(parseCutterRemnantNumeric(row.actualCutterRemnant) * 100) / 100;
+    // สูตรตามที่แอดมินแจ้ง: ผ้าคงเหลือต่างกัน = จำนวนหลาผ้าคงเหลือตามสูตร - คงเหลือ/หลา #ช่างนอก
+    const diffRemnantYards = Math.round((expectedRemnantYards - actualCutterNumeric) * 100) / 100;
 
     return {
       lminiTotal,
@@ -400,6 +409,8 @@
       sentYards,
       carriedYards,
       expectedRemnantYards,
+      actualCutterNumeric,
+      diffRemnantYards,
       totalUnits
     };
   }
@@ -420,6 +431,8 @@
     let grandTotalSentYards = 0;
     let grandTotalCarriedYards = 0;
     let grandTotalExpectedRemnant = 0;
+    let grandTotalActualCutterRemnant = 0;
+    let grandTotalDiffRemnant = 0;
     let grandTotalCutWage = 0;
     let totalLMiniL = 0;
     let totalLMiniR = 0;
@@ -440,6 +453,8 @@
       grandTotalSentYards += m.sentYards;
       grandTotalCarriedYards += m.carriedYards;
       grandTotalExpectedRemnant += m.expectedRemnantYards;
+      grandTotalActualCutterRemnant += m.actualCutterNumeric;
+      grandTotalDiffRemnant += m.diffRemnantYards;
 
       totalLMiniL += Number(row.lminiL || 0);
       totalLMiniR += Number(row.lminiR || 0);
@@ -471,6 +486,8 @@
       grandTotalSentYards,
       grandTotalCarriedYards,
       grandTotalExpectedRemnant,
+      grandTotalActualCutterRemnant,
+      grandTotalDiffRemnant,
       grandTotalCutWage,
       totalLMiniL,
       totalLMiniR,
@@ -700,6 +717,10 @@
               <input type="text" value="${row.actualCutterRemnant || ''}" placeholder="เช่น 60.4+เศษ" data-r-idx="${idx}" data-r-field="actualCutterRemnant"
                 class="w-24 px-1.5 py-0.5 text-right text-[11px] font-bold text-amber-900 border border-amber-400 rounded bg-white">
             </td>
+            <!-- ผ้าคงเหลือต่างกัน (= จำนวนผ้า/หลา คงเหลือตามสูตร - คงเหลือ/หลา #ช่างนอก) -->
+            <td class="py-1.5 px-2 text-right text-[11px] font-extrabold border-x border-rose-200 ${Math.abs(m.diffRemnantYards) < 0.01 ? 'text-emerald-700 bg-emerald-50/60' : (m.diffRemnantYards > 0 ? 'text-rose-700 bg-rose-50/80' : 'text-sky-700 bg-sky-50/80')}" title="สูตร: ${this.fmt(m.expectedRemnantYards, 2)} (ตามสูตร) - ${this.fmt(m.actualCutterNumeric, 2)} (#ช่างนอก) = ${this.fmt(m.diffRemnantYards, 2)} หลา">
+              ${m.diffRemnantYards < 0 ? `-${this.fmt(Math.abs(m.diffRemnantYards), 2)}` : this.fmt(m.diffRemnantYards, 2)}
+            </td>
             <!-- หมายเหตุ รีเช็ค -->
             <td class="py-1 px-1.5">
               <select data-r-idx="${idx}" data-r-field="note" class="px-1.5 py-0.5 text-[11px] font-bold rounded border ${noteBadgeColor}">
@@ -732,9 +753,11 @@
           <td class="py-2.5 px-2 text-center text-slate-300">ส่งจริงรวม:</td>
           <td class="py-2.5 px-2 text-right text-emerald-300">${this.fmt(totals.grandTotalSentYards, 2)} หลา</td>
           <td class="py-2.5 px-2 text-right text-slate-300">${this.fmt(totals.grandTotalCarriedYards, 2)}</td>
-          <td class="py-2.5 px-2 text-right text-amber-200">${this.fmt(totals.grandTotalExpectedRemnant, 2)}</td>
-          <td colspan="2" class="py-2.5 px-2 text-center bg-indigo-950 text-indigo-200">
-            รวมตัดทั้งหมด: <strong class="text-white text-sm">${this.fmt(totals.grandTotalUnits, 0)}</strong> ชุด
+          <td class="py-2.5 px-2 text-right text-amber-200" title="รวมคงเหลือตามสูตร">${this.fmt(totals.grandTotalExpectedRemnant, 2)}</td>
+          <td class="py-2.5 px-2 text-right text-amber-300" title="รวมคงเหลือ #ช่างนอก">${this.fmt(totals.grandTotalActualCutterRemnant, 2)}</td>
+          <td class="py-2.5 px-2 text-right text-rose-300 bg-rose-950/80 border-x border-rose-700" title="รวมผลต่างผ้าคงเหลือ (ตามสูตร - #ช่างนอก)">${this.fmt(totals.grandTotalDiffRemnant, 2)}</td>
+          <td class="py-2.5 px-2 text-center bg-indigo-950 text-indigo-200">
+            รวมตัด: <strong class="text-white text-sm">${this.fmt(totals.grandTotalUnits, 0)}</strong> ชุด
           </td>
         </tr>
         <tr class="bg-slate-100 text-slate-700 font-semibold text-xs border-t border-slate-300">
@@ -744,7 +767,7 @@
           `).join('')}
           <td colspan="3" class="py-2 px-2 text-right font-bold text-indigo-900">ราคารวมยอดสั่งตัด (ค่าแรงช่าง):</td>
           <td class="py-2 px-2 text-right font-extrabold text-indigo-700 text-sm bg-indigo-50">฿${this.fmt(totals.grandTotalCutWage, 2)}</td>
-          <td colspan="6" class="py-2 px-3 text-[11px] text-slate-500">
+          <td colspan="7" class="py-2 px-3 text-[11px] text-slate-500">
             แยกตามกลุ่มผ้า: PVC ${this.fmt(totals.groupSummary['PVC หนัง'].yardsUsed, 1)} หลา | ลูกฟูก ${this.fmt(totals.groupSummary['ลูกฟูก'].yardsUsed, 1)} หลา | ฮอลแลนด์ ${this.fmt(totals.groupSummary['Hollan'].yardsUsed, 1)} หลา | นาโน ${this.fmt(totals.groupSummary['นาโน'].yardsUsed, 1)} หลา
           </td>
         </tr>
@@ -753,7 +776,7 @@
           ${ROUTINE_MODELS.map(mod => `
             <td colspan="2" class="py-2 px-2 text-center border-l border-indigo-200 text-indigo-900">฿${this.fmt(totals.modelWageTotals[mod.key], 0)}</td>
           `).join('')}
-          <td colspan="10" class="py-2 px-3 text-xs text-rose-700 font-semibold">
+          <td colspan="11" class="py-2 px-3 text-xs text-rose-700 font-semibold">
             📌 ${round.extraNote || '-'}
           </td>
         </tr>
@@ -1336,7 +1359,7 @@
 
       // Sheet 1: ใบเบิกผ้าคำนวณตัด
       const aoa1 = [
-        ['เบอร์สี SKU', 'สี', 'กลุ่มผ้า', 'CS2 (3.2Y)', 'รวมหลา CS2', 'CS3 (4.33Y)', 'รวมหลา CS3', 'เฉพาะแขน (1.93Y)', 'รวมหลาแขน', 'RS หัวกระดก (6.26Y)', 'รวมหลา RS', 'LN3 กระดุม 19 เม็ด (6.21Y)', 'รวมหลา LN3', 'LN กระดุม 5 เม็ด (6.17Y)', 'รวมหลา LN5', 'PN ปรับนอน (6.65Y)', 'รวมหลา PN', 'L-Mini ซ้าย', 'L-Mini ขวา', 'รวมหลา L-Mini (8.97Y)', 'รวมเบิก (หลา)', 'จำนวนม้วน (÷50)', 'ราคา/หลา', 'รวมยอดค่าผ้า', 'หักผ้าที่มี / สั่งม้วน', 'จำนวนหลาที่ส่งจริง', 'ยอดยกมา (หลา)', 'จำนวนผ้าคงเหลือตามสูตร', 'คงเหลือจริง #ช่างนอก', 'หมายเหตุรีเช็ค']
+        ['เบอร์สี SKU', 'สี', 'กลุ่มผ้า', 'CS2 (3.2Y)', 'รวมหลา CS2', 'CS3 (4.33Y)', 'รวมหลา CS3', 'เฉพาะแขน (1.93Y)', 'รวมหลาแขน', 'RS หัวกระดก (6.26Y)', 'รวมหลา RS', 'LN3 กระดุม 19 เม็ด (6.21Y)', 'รวมหลา LN3', 'LN กระดุม 5 เม็ด (6.17Y)', 'รวมหลา LN5', 'PN ปรับนอน (6.65Y)', 'รวมหลา PN', 'L-Mini ซ้าย', 'L-Mini ขวา', 'รวมหลา L-Mini (8.97Y)', 'รวมเบิก (หลา)', 'จำนวนม้วน (÷50)', 'ราคา/หลา', 'รวมยอดค่าผ้า', 'หักผ้าที่มี / สั่งม้วน', 'จำนวนหลาที่ส่งจริง', 'ยอดยกมา (หลา)', 'จำนวนผ้าคงเหลือตามสูตร', 'คงเหลือจริง #ช่างนอก', 'ผ้าคงเหลือต่างกัน (ตามสูตร - #ช่างนอก)', 'หมายเหตุรีเช็ค']
       ];
 
       (round.rows || []).forEach(r => {
@@ -1353,7 +1376,7 @@
           r.lminiL || 0, r.lminiR || 0, m.modelYards.lmini,
           m.totalUsedYards, m.calcRolls, r.price, m.fabricCost,
           r.orderRollsText || '', r.sentYards || 0, r.carriedYards || 0,
-          m.expectedRemnantYards, r.actualCutterRemnant || '', r.note || ''
+          m.expectedRemnantYards, r.actualCutterRemnant || '', m.diffRemnantYards, r.note || ''
         ]);
       });
 
@@ -1368,7 +1391,7 @@
         totals.modelQtyTotals.rc, '',
         totals.totalLMiniL, totals.totalLMiniR, '',
         totals.grandTotalUsedYards, totals.grandTotalCalcRolls, 'ราคารวมค่าผ้า:', totals.grandTotalFabricCost,
-        'รวมค่าแรงตัด:', totals.grandTotalCutWage, 'รวมชุดทั้งหมด:', totals.grandTotalUnits, '', ''
+        'รวมค่าแรงตัด:', totals.grandTotalCutWage, 'รวมคงเหลือตามสูตร:', totals.grandTotalExpectedRemnant, totals.grandTotalActualCutterRemnant, totals.grandTotalDiffRemnant, `รวม ${totals.grandTotalUnits} ชุด`
       ]);
 
       // Sheet 2: ใบสั่งตัดนอก (แยก L-mini ซ้าย/ขวา)
