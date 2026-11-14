@@ -152,6 +152,7 @@
       this.lastCloudSync = null;
       this.deviceId = 'QC-FAB-' + Math.random().toString(36).slice(2, 9);
       this.isApplyingRemote = false;
+      this.hasInitialCloudSynced = false;
       this._pushCutterTimer = null;
       this._pushStockTimer = null;
 
@@ -230,10 +231,81 @@
       }
     }
 
+    mergeAdminRoutineStates(localAR, remoteAR) {
+      if (!remoteAR) return localAR || null;
+      if (!localAR) return remoteAR;
+
+      // Union rounds by id, keeping newer updatedAt (or preserving user-added rounds)
+      const localRounds = Array.isArray(localAR.rounds) ? localAR.rounds : [];
+      const remoteRounds = Array.isArray(remoteAR.rounds) ? remoteAR.rounds : [];
+      const roundMap = new Map();
+
+      remoteRounds.forEach(r => { if (r && r.id) roundMap.set(r.id, r); });
+      localRounds.forEach(lr => {
+        if (!lr || !lr.id) return;
+        const rr = roundMap.get(lr.id);
+        if (!rr) {
+          roundMap.set(lr.id, lr);
+        } else {
+          const lTime = lr.updatedAt ? new Date(lr.updatedAt).getTime() : 0;
+          const rTime = rr.updatedAt ? new Date(rr.updatedAt).getTime() : 0;
+          if (lTime > rTime) {
+            roundMap.set(lr.id, lr);
+          }
+        }
+      });
+
+      const mergedRounds = Array.from(roundMap.values());
+      const lRootTime = localAR.updatedAt ? new Date(localAR.updatedAt).getTime() : 0;
+      const rRootTime = remoteAR.updatedAt ? new Date(remoteAR.updatedAt).getTime() : 0;
+      const preferLocal = lRootTime > rRootTime;
+      const primary = preferLocal ? localAR : remoteAR;
+      const secondary = preferLocal ? remoteAR : localAR;
+
+      return {
+        ...secondary,
+        ...primary,
+        rounds: mergedRounds,
+        activeRoundId: primary.activeRoundId || secondary.activeRoundId || (mergedRounds[0] && mergedRounds[0].id),
+        cutSewStockStandard: primary.cutSewStockStandard || secondary.cutSewStockStandard || [],
+        cutSewStockLMini: primary.cutSewStockLMini || secondary.cutSewStockLMini || [],
+        preOrderDailyRecords: primary.preOrderDailyRecords || secondary.preOrderDailyRecords || [],
+        woodFrameStock: primary.woodFrameStock || secondary.woodFrameStock || [],
+        sparePartsOrders: primary.sparePartsOrders || secondary.sparePartsOrders || [],
+        csBsLuStockMatrix: primary.csBsLuStockMatrix || secondary.csBsLuStockMatrix || []
+      };
+    }
+
+    mergeStockMovementData(localStock, remoteStock) {
+      if (!remoteStock || !Array.isArray(remoteStock.products)) return localStock;
+      if (!localStock || !Array.isArray(localStock.products)) return remoteStock;
+
+      const prodMap = new Map();
+      (localStock.products || []).forEach(p => { if (p && p.id) prodMap.set(p.id, p); });
+      (remoteStock.products || []).forEach(p => { if (p && p.id) prodMap.set(p.id, p); });
+
+      const mergeTx = (arrA, arrB) => {
+        const map = new Map();
+        const keyOf = (tx) => tx.id ? `${tx.id}_${tx.date || ''}_${tx.productId || tx.productName || ''}_${tx.quantity || 0}` : `${tx.date}_${tx.productId || tx.productName}_${tx.quantity}_${tx.note || tx.dailyUsage || ''}`;
+        (arrA || []).forEach(tx => { if (tx) map.set(keyOf(tx), tx); });
+        (arrB || []).forEach(tx => { if (tx) map.set(keyOf(tx), tx); });
+        return Array.from(map.values());
+      };
+
+      return {
+        categories: remoteStock.categories || localStock.categories || ['กลุ่มไม้', 'กลุ่มฟองน้ำ', 'ฮาร์ดแวร์และวัสดุประกอบ', 'บรรจุภัณฑ์และพลาสติก', 'ผ้าม้วน', 'วัสดุทั่วไป'],
+        products: Array.from(prodMap.values()),
+        inbound: mergeTx(localStock.inbound, remoteStock.inbound),
+        outbound: mergeTx(localStock.outbound, remoteStock.outbound),
+        adjustments: mergeTx(localStock.adjustments, remoteStock.adjustments)
+      };
+    }
+
     applyRemoteCutterState(remoteState) {
       if (!remoteState) return;
       this.isApplyingRemote = true;
       try {
+        const mergedAdminRoutine = this.mergeAdminRoutineStates(this.state.adminRoutine, remoteState.adminRoutine);
         this.state = {
           ...this.state,
           ...remoteState,
@@ -241,10 +313,11 @@
           cutterBalance: remoteState.cutterBalance || this.state.cutterBalance,
           cuttingBatches: Array.isArray(remoteState.cuttingBatches) ? remoteState.cuttingBatches : this.state.cuttingBatches,
           cutterLedger: Array.isArray(remoteState.cutterLedger) ? remoteState.cutterLedger : this.state.cutterLedger,
-          adminRoutine: remoteState.adminRoutine || this.state.adminRoutine || null
+          adminRoutine: mergedAdminRoutine
         };
         this.ensureCutterBalanceEntries();
         localStorage.setItem(FABRIC_CUTTER_STATE_KEY, JSON.stringify(this.state));
+        localStorage.setItem(FABRIC_CUTTER_STATE_KEY + '_backup', JSON.stringify(this.state));
         this.setCloudStatus('online', 'อัปเดตข้อมูลล่าสุดจากคลาวด์แล้ว');
         this.notify();
       } finally {
@@ -256,15 +329,10 @@
       if (!remoteStock || !Array.isArray(remoteStock.products)) return;
       this.isApplyingRemote = true;
       try {
-        this.stockData = {
-          categories: remoteStock.categories || ['กลุ่มไม้', 'กลุ่มฟองน้ำ', 'ฮาร์ดแวร์และวัสดุประกอบ', 'บรรจุภัณฑ์และพลาสติก', 'ผ้าม้วน', 'วัสดุทั่วไป'],
-          products: remoteStock.products || [],
-          inbound: remoteStock.inbound || [],
-          outbound: remoteStock.outbound || [],
-          adjustments: remoteStock.adjustments || []
-        };
+        this.stockData = this.mergeStockMovementData(this.stockData, remoteStock);
         this.ensureBomFabricsInStockMovement();
         localStorage.setItem(STOCK_MOVEMENT_KEY, JSON.stringify(this.stockData));
+        localStorage.setItem(STOCK_MOVEMENT_KEY + '_backup', JSON.stringify(this.stockData));
         this.syncToBomPlannerYards();
         this.setCloudStatus('online', 'ซิงค์สต็อกผ้าจากคลาวด์แล้ว');
         this.notify();
@@ -287,33 +355,50 @@
         const map = {};
         (data || []).forEach(r => { map[r.batch_id] = r; });
 
-        // 1. Stock Movement Cloud Sync
+        // 1. Stock Movement Cloud Sync (Always pull & union-merge, NEVER blindly overwrite existing cloud stock from bootstrap!)
         if (map[CLOUD_STOCK_MOVEMENT_ID] && map[CLOUD_STOCK_MOVEMENT_ID].items_json && Array.isArray(map[CLOUD_STOCK_MOVEMENT_ID].items_json.products)) {
           this.applyRemoteStockData(map[CLOUD_STOCK_MOVEMENT_ID].items_json);
-        } else if (initialBootstrap) {
-          await this.pushStockMovementToCloud();
         }
 
         // 2. Fabric Cutter State Cloud Sync
         if (map[CLOUD_FABRIC_STATE_ID] && map[CLOUD_FABRIC_STATE_ID].items_json) {
           this.applyRemoteCutterState(map[CLOUD_FABRIC_STATE_ID].items_json);
-        } else if (initialBootstrap) {
-          await this.pushCutterStateToCloud();
         }
 
+        this.hasInitialCloudSynced = true;
         this.setCloudStatus('online', 'ซิงค์สดทุกอุปกรณ์ (Supabase Cloud)');
         return true;
       } catch (err) {
         console.warn('[FabricStore] syncFromCloud error:', err);
+        this.hasInitialCloudSynced = true;
         this.setCloudStatus('offline', 'ออฟไลน์ (ใช้ข้อมูลในเครื่อง)');
         return false;
       }
     }
 
     async pushCutterStateToCloud() {
-      if (!this.supabase || this.isApplyingRemote) return false;
+      if (!this.supabase || this.isApplyingRemote || !this.hasInitialCloudSynced) return false;
       this.setCloudStatus('syncing', 'กำลังบันทึกขึ้น Cloud...');
       try {
+        // Pull latest remote state first to union-merge rounds so no user data from another tab/device is ever overwritten
+        const { data: existingRows } = await this.supabase
+          .from(TABLE_PRODUCTION_BATCHES)
+          .select('items_json')
+          .eq('batch_id', CLOUD_FABRIC_STATE_ID)
+          .limit(1);
+
+        if (Array.isArray(existingRows) && existingRows[0] && existingRows[0].items_json) {
+          const remoteState = existingRows[0].items_json;
+          this.state.adminRoutine = this.mergeAdminRoutineStates(this.state.adminRoutine, remoteState.adminRoutine);
+        }
+
+        const nowIso = new Date().toISOString();
+        const itemsJsonPayload = {
+          ...this.state,
+          updatedByDevice: this.deviceId,
+          updatedAt: nowIso
+        };
+
         const payload = {
           batch_id: CLOUD_FABRIC_STATE_ID,
           batch_name: 'QueenCosy Fabric Roll & Outsource Cutter State',
@@ -322,21 +407,25 @@
           total_skus: (this.state.weeklyPlan || []).length,
           total_units: (this.state.cuttingBatches || []).length,
           total_material_cost: 0,
-          items_json: {
-            ...this.state,
-            updatedByDevice: this.deviceId,
-            updatedAt: new Date().toISOString()
-          },
-          updated_at: new Date().toISOString(),
+          items_json: itemsJsonPayload,
+          updated_at: nowIso,
           notes: 'Synced from fabric-cutter-web'
+        };
+
+        const backupPayload = {
+          ...payload,
+          batch_id: 'QC_FABRIC_CUTTER_BACKUP_V1',
+          batch_name: 'QueenCosy Fabric Cutter Auto-Backup V1',
+          notes: 'Auto-backup from fabric-cutter-web'
         };
 
         const { error } = await this.supabase
           .from(TABLE_PRODUCTION_BATCHES)
-          .upsert(payload, { onConflict: 'batch_id' });
+          .upsert([payload, backupPayload], { onConflict: 'batch_id' });
 
         if (error) throw error;
-        this.setCloudStatus('online', 'บันทึกขึ้น Supabase Cloud สำเร็จ');
+        localStorage.setItem(FABRIC_CUTTER_STATE_KEY + '_backup', JSON.stringify(this.state));
+        this.setCloudStatus('online', 'บันทึกและสำรองข้อมูลขึ้น Cloud สำเร็จ');
         return true;
       } catch (err) {
         console.warn('[FabricStore] pushCutterStateToCloud error:', err);
@@ -346,9 +435,22 @@
     }
 
     async pushStockMovementToCloud() {
-      if (!this.supabase || this.isApplyingRemote || !this.stockData) return false;
+      if (!this.supabase || this.isApplyingRemote || !this.stockData || !this.hasInitialCloudSynced) return false;
       this.setCloudStatus('syncing', 'กำลังซิงค์สต็อกขึ้น Cloud...');
       try {
+        // Always fetch & union-merge remote stock movement first so we NEVER overwrite movements added in stock-movement-app!
+        const { data: existingRows } = await this.supabase
+          .from(TABLE_PRODUCTION_BATCHES)
+          .select('items_json')
+          .eq('batch_id', CLOUD_STOCK_MOVEMENT_ID)
+          .limit(1);
+
+        if (Array.isArray(existingRows) && existingRows[0] && existingRows[0].items_json) {
+          this.stockData = this.mergeStockMovementData(this.stockData, existingRows[0].items_json);
+          localStorage.setItem(STOCK_MOVEMENT_KEY, JSON.stringify(this.stockData));
+        }
+
+        const nowIso = new Date().toISOString();
         const payload = {
           batch_id: CLOUD_STOCK_MOVEMENT_ID,
           batch_name: 'QueenCosy Stock Movement Master Data V4',
@@ -360,9 +462,9 @@
           items_json: {
             ...this.stockData,
             updatedByDevice: this.deviceId,
-            updatedAt: new Date().toISOString()
+            updatedAt: nowIso
           },
-          updated_at: new Date().toISOString(),
+          updated_at: nowIso,
           notes: 'Synced from fabric-cutter-web & stock-movement-app'
         };
 
@@ -709,11 +811,14 @@
       });
     }
 
-    saveCutterState() {
+    saveCutterState(pushCloud = true) {
       try {
         localStorage.setItem(FABRIC_CUTTER_STATE_KEY, JSON.stringify(this.state));
+        if (pushCloud) {
+          localStorage.setItem(FABRIC_CUTTER_STATE_KEY + '_backup', JSON.stringify(this.state));
+        }
         this.notify();
-        if (!this.isApplyingRemote) {
+        if (pushCloud && !this.isApplyingRemote && this.hasInitialCloudSynced) {
           clearTimeout(this._pushCutterTimer);
           this._pushCutterTimer = setTimeout(() => {
             this.pushCutterStateToCloud();
@@ -839,7 +944,7 @@
         ]
       };
       this.ensureCutterBalanceEntries();
-      this.saveCutterState();
+      this.saveCutterState(false);
     }
 
     // =========================================================

@@ -9,6 +9,28 @@ window.INITIAL_INVENTORY_DATA = {
   ],
   "products": [
     {
+      "id": "PROD-121",
+      "name": "ปืนยิงลวด 1013JD",
+      "note": "สั่ง Shoppee มีใบกำกับ",
+      "unit": "ตัว",
+      "category": "วัสดุทั่วไป",
+      "minAlert": 100,
+      "unitPrice": 790,
+      "initialStock": 0,
+      "conversionNote": ""
+    },
+    {
+      "id": "PROD-120",
+      "name": "ปืมลมยิงลวด K440KB",
+      "note": "สั่ง Shoppee มีใบกำกับ",
+      "unit": "ตัว",
+      "category": "วัสดุทั่วไป",
+      "minAlert": 100,
+      "unitPrice": 1950,
+      "initialStock": 0,
+      "conversionNote": "Meite"
+    },
+    {
       "id": "PROD-119",
       "name": "356-04B ร่อนใหญ่ (น้ำตาล)",
       "note": "",
@@ -16,8 +38,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 65,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-118",
@@ -137,8 +158,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-108",
@@ -148,8 +168,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-107",
@@ -159,8 +178,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-106",
@@ -170,19 +188,17 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 30,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-105",
       "name": "PQ002C-19 (ชา)",
       "note": "",
       "unit": "หลา",
-      "category": "บรรจุภัณฑ์และพลาสติก",
+      "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-104",
@@ -192,8 +208,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-103",
@@ -203,8 +218,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-102",
@@ -214,8 +228,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-101",
@@ -225,8 +238,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-100",
@@ -236,8 +248,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 32,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-099",
@@ -247,8 +258,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-098",
@@ -258,8 +268,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-097",
@@ -269,8 +278,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-096",
@@ -280,8 +288,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-095",
@@ -291,8 +298,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-094",
@@ -302,8 +308,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-093",
@@ -313,8 +318,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-092",
@@ -324,8 +328,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-091",
@@ -335,8 +338,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-090",
@@ -346,8 +348,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-089",
@@ -357,8 +358,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-088",
@@ -368,8 +368,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-087",
@@ -379,8 +378,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-086",
@@ -390,8 +388,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-085",
@@ -401,8 +398,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-084",
@@ -412,8 +408,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-083",
@@ -423,8 +418,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 52,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-082",
@@ -434,8 +428,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-081",
@@ -445,8 +438,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-080",
@@ -456,8 +448,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-079",
@@ -467,8 +458,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-078",
@@ -478,8 +468,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-077",
@@ -489,8 +478,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-076",
@@ -500,8 +488,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 54,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-075",
@@ -511,8 +498,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-074",
@@ -522,8 +508,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-073",
@@ -533,8 +518,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-072",
@@ -544,8 +528,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-071",
@@ -555,8 +538,7 @@ window.INITIAL_INVENTORY_DATA = {
       "category": "ผ้าม้วน",
       "minAlert": 100,
       "unitPrice": 53,
-      "initialStock": 0,
-      "conversionNote": ""
+      "initialStock": 0
     },
     {
       "id": "PROD-070",
@@ -1319,6 +1301,282 @@ window.INITIAL_INVENTORY_DATA = {
     }
   ],
   "inbound": [
+    {
+      "id": "IN-0450",
+      "date": "2026-11-13",
+      "note": "",
+      "type": "IN",
+      "quantity": 170,
+      "supplier": "พรีเมี่ยม",
+      "productId": "PROD-014",
+      "unitPrice": 341,
+      "totalValue": 57970,
+      "productName": "ฟองน้ำ 2\" เนื้อนั่ง PM7"
+    },
+    {
+      "id": "IN-0449",
+      "date": "2026-11-13",
+      "note": "",
+      "type": "IN",
+      "quantity": 30,
+      "supplier": "ToDa",
+      "productId": "PROD-069",
+      "unitPrice": 810,
+      "totalValue": 24300,
+      "productName": "กาวพ่น (Toda)"
+    },
+    {
+      "id": "IN-0448",
+      "date": "2026-11-13",
+      "note": "",
+      "type": "IN",
+      "quantity": 50,
+      "supplier": "กุลนาถ",
+      "productId": "PROD-068",
+      "unitPrice": 300,
+      "totalValue": 15000,
+      "productName": "บับเบิ้ล ( Bubble) กุลนาถ"
+    },
+    {
+      "id": "IN-0447",
+      "date": "2026-11-13",
+      "note": "เข้า 8 ลัง",
+      "type": "IN",
+      "quantity": 240,
+      "supplier": "MJ",
+      "productId": "PROD-044",
+      "unitPrice": 26.66,
+      "totalValue": 6398.4,
+      "productName": "แม็ก 1008J"
+    },
+    {
+      "id": "IN-0446",
+      "date": "2026-11-13",
+      "note": "เข้า 16 ลัง",
+      "type": "IN",
+      "quantity": 192,
+      "supplier": "MJ",
+      "productId": "PROD-042",
+      "unitPrice": 68.33,
+      "totalValue": 13119.36,
+      "productName": "แม็ก F40 (MJ)"
+    },
+    {
+      "id": "IN-0445",
+      "date": "2026-11-13",
+      "note": "",
+      "type": "IN",
+      "quantity": 1000,
+      "supplier": "MJ",
+      "productId": "PROD-002",
+      "unitPrice": 12.5,
+      "totalValue": 12500,
+      "productName": "ไม้ระแนงยาว 150-200 M"
+    },
+    {
+      "id": "IN-0444",
+      "date": "2026-11-13",
+      "note": "",
+      "type": "IN",
+      "quantity": 2000,
+      "supplier": "MJ",
+      "productId": "PROD-003",
+      "unitPrice": 7,
+      "totalValue": 14000,
+      "productName": "ไม้สะเดา 100-140 M"
+    },
+    {
+      "id": "IN-0443",
+      "date": "2026-11-10",
+      "note": "Shoppee",
+      "type": "IN",
+      "quantity": 2,
+      "supplier": "ทั่วไป",
+      "productId": "PROD-121",
+      "unitPrice": 790,
+      "totalValue": 1580,
+      "productName": "ปืนยิงลวด 1013JD"
+    },
+    {
+      "id": "IN-0442",
+      "date": "2026-11-11",
+      "note": "",
+      "type": "IN",
+      "quantity": 1000,
+      "supplier": "MJ",
+      "productId": "PROD-002",
+      "unitPrice": 12.5,
+      "totalValue": 12500,
+      "productName": "ไม้ระแนงยาว 150-200 M"
+    },
+    {
+      "id": "IN-0441",
+      "date": "2026-11-12",
+      "note": "",
+      "type": "IN",
+      "quantity": 1000,
+      "supplier": "MJ",
+      "productId": "PROD-002",
+      "unitPrice": 12.5,
+      "totalValue": 12500,
+      "productName": "ไม้ระแนงยาว 150-200 M"
+    },
+    {
+      "id": "IN-0440",
+      "date": "2026-11-12",
+      "note": "",
+      "type": "IN",
+      "quantity": 2000,
+      "supplier": "MJ",
+      "productId": "PROD-001",
+      "unitPrice": 5.5,
+      "totalValue": 11000,
+      "productName": "ไม้ระแนง 100-140 M"
+    },
+    {
+      "id": "IN-0439",
+      "date": "2026-11-10",
+      "note": "",
+      "type": "IN",
+      "quantity": 1,
+      "supplier": "ทั่วไป",
+      "productId": "PROD-120",
+      "unitPrice": 1950,
+      "totalValue": 1950,
+      "productName": "ปืมลมยิงลวด K440KB"
+    },
+    {
+      "id": "IN-0438",
+      "date": "2026-11-11",
+      "note": "",
+      "type": "IN",
+      "quantity": 50,
+      "supplier": "พรีเมี่ยม",
+      "productId": "PROD-118",
+      "unitPrice": 170.5,
+      "totalValue": 8525,
+      "productName": "ฟองน้ำ 1\" เนื้อ PM7"
+    },
+    {
+      "id": "IN-0437",
+      "date": "2026-11-11",
+      "note": "",
+      "type": "IN",
+      "quantity": 170,
+      "supplier": "พรีเมี่ยม",
+      "productId": "PROD-014",
+      "unitPrice": 341,
+      "totalValue": 57970,
+      "productName": "ฟองน้ำ 2\" เนื้อนั่ง PM7"
+    },
+    {
+      "id": "IN-0437",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 250,
+      "supplier": "ToDa",
+      "productId": "PROD-100",
+      "unitPrice": 32,
+      "totalValue": 8000,
+      "productName": "PD9006 (มอคค่า) TD"
+    },
+    {
+      "id": "IN-0436",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 150,
+      "supplier": "ToDa",
+      "productId": "PROD-101",
+      "unitPrice": 32,
+      "totalValue": 4800,
+      "productName": "PD130 (ดำ) TD"
+    },
+    {
+      "id": "IN-0435",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 285.7,
+      "supplier": "MJ",
+      "productId": "PROD-072",
+      "unitPrice": 53,
+      "totalValue": 15142.099999999999,
+      "productName": "MJ736B-2 (นาโนเทา)"
+    },
+    {
+      "id": "IN-0434",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 127.1,
+      "supplier": "MJ",
+      "productId": "PROD-071",
+      "unitPrice": 53,
+      "totalValue": 6736.299999999999,
+      "productName": "MJ736B-4 (นาโนฟ้า)"
+    },
+    {
+      "id": "IN-0433",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 115.6,
+      "supplier": "MJ",
+      "productId": "PROD-073",
+      "unitPrice": 53,
+      "totalValue": 6126.799999999999,
+      "productName": "MJ736B-1 (นาโนน้ำตาลทอง)"
+    },
+    {
+      "id": "IN-0432",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 115,
+      "supplier": "MJ",
+      "productId": "PROD-085",
+      "unitPrice": 52,
+      "totalValue": 5980,
+      "productName": "MJ337-29 (เทาควัน)"
+    },
+    {
+      "id": "IN-0431",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 250,
+      "supplier": "MJ",
+      "productId": "PROD-103",
+      "unitPrice": 32,
+      "totalValue": 8000,
+      "productName": "PQ002C-46 (เทา)"
+    },
+    {
+      "id": "IN-0429",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "type": "IN",
+      "quantity": 650,
+      "supplier": "MJ",
+      "productId": "PROD-107",
+      "unitPrice": 32,
+      "totalValue": 20800,
+      "productName": "PQ002C-12 (น้ำตาล)"
+    },
+    {
+      "id": "IN-0428",
+      "date": "2026-11-10",
+      "note": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย ",
+      "type": "IN",
+      "quantity": 350,
+      "supplier": "MJ",
+      "productId": "PROD-108",
+      "unitPrice": 32,
+      "totalValue": 11200,
+      "productName": "PQ002C-06 (ครีม)"
+    },
     {
       "id": "IN-0427",
       "date": "2026-11-10",
@@ -3549,7 +3807,7 @@ window.INITIAL_INVENTORY_DATA = {
       "productId": "PROD-007",
       "unitPrice": 40,
       "totalValue": 10320,
-      "productName": "ไม้อัด 40.- (สมไกร)"
+      "productName": "ไ���้อัด 40.- (สมไกร)"
     },
     {
       "id": "IN-0243",
@@ -3765,7 +4023,7 @@ window.INITIAL_INVENTORY_DATA = {
       "productId": "PROD-001",
       "unitPrice": 5.5,
       "totalValue": 11000,
-      "productName": "ไม้ระแนง 100-140 M"
+      "productName": "ไม้ระ��นง 100-140 M"
     },
     {
       "id": "IN-0225",
@@ -3981,7 +4239,7 @@ window.INITIAL_INVENTORY_DATA = {
       "productId": "PROD-052",
       "unitPrice": 14.01,
       "totalValue": 22542.09,
-      "productName": "ผ้าปิดตูด"
+      "productName": "ผ้า���ิดตูด"
     },
     {
       "id": "IN-0207",
@@ -5613,7 +5871,7 @@ window.INITIAL_INVENTORY_DATA = {
       "productId": "PROD-024",
       "unitPrice": 94.5,
       "totalValue": 4725,
-      "productName": "ฟองน้ำ 1\" (DF)"
+      "productName": "��องน้ำ 1\" (DF)"
     },
     {
       "id": "IN-0070",
@@ -6189,7 +6447,7 @@ window.INITIAL_INVENTORY_DATA = {
       "productId": "PROD-014",
       "unitPrice": 310,
       "totalValue": 40300,
-      "productName": "ฟองน้ำ 2\" เนื้อนั่ง PM7"
+      "productName": "ฟองน้ำ 2\" เนื้���นั่ง PM7"
     },
     {
       "id": "IN-0022",
@@ -6446,6 +6704,286 @@ window.INITIAL_INVENTORY_DATA = {
   ],
   "outbound": [
     {
+      "id": "OUT-0667",
+      "date": "2026-11-13",
+      "type": "OUT",
+      "unit": "ตัว",
+      "quantity": 1,
+      "productId": "PROD-120",
+      "dailyUsage": "เบิกให้มองจอง",
+      "productName": "ปืมลมยิงลวด K440KB"
+    },
+    {
+      "id": "OUT-0666",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 127.1,
+      "productId": "PROD-071",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "MJ736B-4 (นาโนฟ้า)"
+    },
+    {
+      "id": "OUT-0665",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 285.7,
+      "productId": "PROD-072",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "MJ736B-2 (นาโนเทา)"
+    },
+    {
+      "id": "OUT-0664",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 115.6,
+      "productId": "PROD-073",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "MJ736B-1 (นาโนน้ำตาลทอง)"
+    },
+    {
+      "id": "OUT-0663",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 115,
+      "productId": "PROD-085",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "MJ337-29 (เทาควัน)"
+    },
+    {
+      "id": "OUT-0662",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 250,
+      "productId": "PROD-100",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "PD9006 (มอคค่า) TD"
+    },
+    {
+      "id": "OUT-0661",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 150,
+      "productId": "PROD-101",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "PD130 (ดำ) TD"
+    },
+    {
+      "id": "OUT-0660",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 250,
+      "productId": "PROD-103",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "PQ002C-46 (เทา)"
+    },
+    {
+      "id": "OUT-0659",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 650,
+      "productId": "PROD-107",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "PQ002C-12 (น้ำตาล)"
+    },
+    {
+      "id": "OUT-0658",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 350,
+      "productId": "PROD-108",
+      "dailyUsage": "ตัดรอบที่ 3 พ.ย : Order 13-21 พ.ย",
+      "productName": "PQ002C-06 (ครีม)"
+    },
+    {
+      "id": "OUT-0657",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 295.2,
+      "productId": "PROD-071",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ736B-4 (นาโนฟ้า)"
+    },
+    {
+      "id": "OUT-0656",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 539.7,
+      "productId": "PROD-072",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ736B-2 (นาโนเทา)"
+    },
+    {
+      "id": "OUT-0655",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 639,
+      "productId": "PROD-073",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ736B-1 (นาโนน้ำตาลทอง)"
+    },
+    {
+      "id": "OUT-0654",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 359.4,
+      "productId": "PROD-083",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-31 (น้ำเงิน)"
+    },
+    {
+      "id": "OUT-0653",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 890.2,
+      "productId": "PROD-085",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-29 (เทาควัน)"
+    },
+    {
+      "id": "OUT-0652",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 71.4,
+      "productId": "PROD-087",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-23 (แดงไวน์)"
+    },
+    {
+      "id": "OUT-0651",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 698.6,
+      "productId": "PROD-088",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-22 (โรสโกลด์)"
+    },
+    {
+      "id": "OUT-0650",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 58.7,
+      "productId": "PROD-089",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-14 (เขียว)"
+    },
+    {
+      "id": "OUT-0649",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 347.3,
+      "productId": "PROD-091",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ337-07 (น้ำตาลทอง)"
+    },
+    {
+      "id": "OUT-0648",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 62.4,
+      "productId": "PROD-093",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "CSF356-3A (ลูกฟูกเขียว)"
+    },
+    {
+      "id": "OUT-0647",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 241,
+      "productId": "PROD-097",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ 356-3A (ลูกฟูกเทา)"
+    },
+    {
+      "id": "OUT-0646",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 152.6,
+      "productId": "PROD-099",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "MJ 356-1A (ลูกฟูกครีม)"
+    },
+    {
+      "id": "OUT-0645",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 1150,
+      "productId": "PROD-100",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "PD9006 (มอคค่า) TD"
+    },
+    {
+      "id": "OUT-0644",
+      "date": "2026-11-14",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 900,
+      "productId": "PROD-101",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "PD130 (ดำ) TD"
+    },
+    {
+      "id": "OUT-0643",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 1200,
+      "productId": "PROD-103",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "PQ002C-46 (เทา)"
+    },
+    {
+      "id": "OUT-0642",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 1350,
+      "productId": "PROD-107",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "PQ002C-12 (น้ำตาล)"
+    },
+    {
+      "id": "OUT-0641",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 1050,
+      "productId": "PROD-108",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "PQ002C-06 (ครีม)"
+    },
+    {
+      "id": "OUT-0640",
+      "date": "2026-11-10",
+      "type": "OUT",
+      "unit": "หลา",
+      "quantity": 234,
+      "productId": "PROD-119",
+      "dailyUsage": "ตัดรอบ 2 : Pre 8-12 พ.ย",
+      "productName": "356-04B ร่อนใหญ่ (น้ำตาล)"
+    },
+    {
       "id": "OUT-0639",
       "date": "2026-11-10",
       "type": "OUT",
@@ -6502,7 +7040,7 @@ window.INITIAL_INVENTORY_DATA = {
       "unit": "ตัว",
       "quantity": 500,
       "productId": "PROD-033",
-      "dailyUsage": "เบิก 9-10 : 2 ถุง",
+      "dailyUsage": "เบิก 9-10 : 2 ถุ��",
       "productName": "ขาพลาสติก 2\""
     },
     {
@@ -6903,7 +7441,7 @@ window.INITIAL_INVENTORY_DATA = {
       "quantity": 50,
       "productId": "PROD-009",
       "dailyUsage": "",
-      "productName": "ไม้อัดใหญ่"
+      "productName": "ไม้อัด���หญ่"
     },
     {
       "id": "OUT-0593",
@@ -7943,7 +8481,7 @@ window.INITIAL_INVENTORY_DATA = {
       "quantity": 1400,
       "productId": "PROD-001",
       "dailyUsage": "",
-      "productName": "ไม้ระแนง 100-140 M"
+      "productName": "ไม้ร��แนง 100-140 M"
     },
     {
       "id": "OUT-0491",
@@ -9453,7 +9991,7 @@ window.INITIAL_INVENTORY_DATA = {
       "quantity": 150,
       "productId": "PROD-011",
       "dailyUsage": "",
-      "productName": "ไม้ยาว 150 M"
+      "productName": "ไม��ยาว 150 M"
     },
     {
       "id": "OUT-0341",

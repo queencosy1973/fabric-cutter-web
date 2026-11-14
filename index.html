@@ -175,14 +175,14 @@
 
     <!-- Main Navigation Tabs -->
     <nav class="flex flex-wrap gap-1.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs no-print">
-      <button data-tab="tab-admin-routine" class="tab-btn active flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
-        <span>📋 1. ใบเบิกผ้าช่างตัด & ใบสั่งตัดนอก (Routine)</span>
-      </button>
-      <button data-tab="tab-cut-sew-stock" class="tab-btn flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
-        <span>🧵 2. ผ้าจับชุดตัด-เย็บ & เช็คโครง/ช่างหุ้ม</span>
+      <button data-tab="tab-cut-sew-stock" class="tab-btn active flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>🧵 1. ผ้าจับชุดตัด-เย็บ & เช็คโครง/ช่างหุ้ม</span>
       </button>
       <button data-tab="tab-preorder-billing" class="tab-btn flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
-        <span>📊 3. รีพอร์ต Pre-Order (ขา/เกียร์) & บิลค่าตัด</span>
+        <span>📊 2. รีพอร์ต Pre-Order (ขา/เกียร์) & บิลค่าตัด</span>
+      </button>
+      <button data-tab="tab-admin-routine" class="tab-btn flex-1 min-w-[195px] py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
+        <span>📋 3. ใบเบิกผ้าช่างตัด & ใบสั่งตัดนอก (Routine)</span>
       </button>
       <button data-tab="tab-weekly-plan" class="tab-btn flex-1 min-w-[180px] py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5">
         <span>📅 4. แผน BOM รายสัปดาห์</span>
@@ -200,9 +200,9 @@
     </nav>
 
     <!-- =================================================================== -->
-    <!-- NEW TAB 1: ADMIN ROUTINE CUTTING MATRIX & OUTSOURCE ORDER SHEET     -->
+    <!-- TAB 3: ADMIN ROUTINE CUTTING MATRIX & OUTSOURCE ORDER SHEET         -->
     <!-- =================================================================== -->
-    <section id="tab-admin-routine" class="tab-pane space-y-5">
+    <section id="tab-admin-routine" class="tab-pane hidden space-y-5">
       <!-- Top Control Bar -->
       <div class="bg-white rounded-2xl p-5 border-2 border-indigo-200 shadow-xs space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
@@ -219,8 +219,8 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <button id="btn-routine-pull-shortages" type="button" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="ดึงรายการที่ติดลบจากตารางผ้าจับชุดตัด-เย็บ (แท็บ 2) มาลงตารางตัดผ้ารอบนี้ทันที">
-              ⚡ ดึงยอดติดลบจากสต็อกผ้าตัด-เย็บ
+            <button id="btn-routine-pull-shortages" type="button" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="ดึงรายการที่ติดลบจากตารางผ้าจับชุดตัด-เย็บ (แท็บ 1) มาลงตารางตัดผ้ารอบนี้ทันที">
+              ⚡ ดึงยอดติดลบจากสต็อกผ้าตัด-เย็บ (แท็บ 1)
             </button>
             <button id="btn-routine-new-round" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
               ➕ สร้างรอบตัดผ้าใหม่ (ยกยอดคงเหลือ)
@@ -396,9 +396,9 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- NEW TAB 2: CUT & SEW STOCK ("ผ้าจับชุดตัด-เย็บ") & WOOD / WORKERS   -->
+    <!-- TAB 1: CUT & SEW STOCK ("ผ้าจับชุดตัด-เย็บ") & WOOD / WORKERS       -->
     <!-- =================================================================== -->
-    <section id="tab-cut-sew-stock" class="tab-pane hidden space-y-6">
+    <section id="tab-cut-sew-stock" class="tab-pane space-y-6">
       <!-- Part 2.1: Standard Models Cut-Sew Stock vs Pre-Order -->
       <div class="bg-white rounded-2xl p-5 border-2 border-rose-200 shadow-xs space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
@@ -418,7 +418,7 @@
               ติดลบ 0 รายการ
             </span>
             <button id="btn-push-all-shortages-tab2" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow transition">
-              🚀 ส่งยอดที่ติดลบทั้งหมดเข้าใบเบิกผ้าช่างตัด (แท็บ 1)
+              🚀 ส่งยอดที่ติดลบทั้งหมดเข้าใบเบิกผ้าช่างตัด (แท็บ 3)
             </button>
           </div>
         </div>
@@ -551,10 +551,10 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- NEW TAB 3: PRE-ORDER DAILY (LEGS/GEARS) + SPARE PARTS + BILLING     -->
+    <!-- TAB 2: PRE-ORDER DAILY (LEGS/GEARS) + SPARE PARTS + BILLING         -->
     <!-- =================================================================== -->
     <section id="tab-preorder-billing" class="tab-pane hidden space-y-6">
-      <!-- Part 3.1: Pre-Order Summary + Drag & Drop Upload + Legs & Gears Calculator -->
+      <!-- Part 2.1: Pre-Order Summary + Drag & Drop Upload + Legs & Gears Calculator -->
       <div class="bg-white rounded-2xl p-5 border-2 border-indigo-200 shadow-xs space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
@@ -565,15 +565,15 @@
               ตารางสรุปรีพอร์ต #Pre-Order งานตัด TT-Shopee แยกตามรุ่นและสี พร้อมคำนวณหลา/ม้วน, ขาโซฟา 1" (ถุงละ 500) และเกียร์ปรับนอน (ลังละ 15)
             </h2>
             <p class="text-xs text-slate-500">
-              แอดมินสามารถลากไฟล์ออเดอร์ Excel / CSV มาวาง หรือคลิกอัปโหลดไฟล์เพื่อแยกสีแยกรุ่น คำนวณหลา/ม้วน ขาโซฟา และเกียร์ปรับนอนอัตโนมัติ (พร้อมส่งยอดเข้าแท็บ 1 ได้ทันที)
+              แอดมินสามารถลากไฟล์ออเดอร์ Excel / CSV มาวาง หรือคลิกอัปโหลดไฟล์เพื่อแยกสีแยกรุ่น คำนวณหลา/ม้วน ขาโซฟา และเกียร์ปรับนอนอัตโนมัติ (พร้อมส่งยอดเข้าสต็อกตัด-เย็บ แท็บ 1 และใบเบิกผ้า แท็บ 3 ได้ทันที)
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button id="btn-preorder-download-template" type="button" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold transition flex items-center gap-1.5">
               📄 ดาวน์โหลดเทมเพลต Pre-Order (.xlsx)
             </button>
-            <button id="btn-preorder-push-to-tab1" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="นำยอด Pre-Order ในตารางนี้ไปใส่ในตารางใบเบิกผ้า (แท็บ 1) และใบสั่งตัดนอกอัตโนมัติ">
-              ⚡ ส่งยอด Pre-Order เข้าใบเบิกผ้า (แท็บ 1)
+            <button id="btn-preorder-push-to-tab1" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5" title="นำยอด Pre-Order ในตารางนี้ไปใส่ในตารางสต็อกผ้าตัด-เย็บ (แท็บ 1) และใบเบิกผ้า/ใบสั่งตัดนอก (แท็บ 3) อัตโนมัติ">
+              ⚡ ส่งยอด Pre-Order เข้าใบเบิกผ้า (แท็บ 3)
             </button>
             <button id="btn-preorder-export-excel" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
               📥 ดาวน์โหลดรีพอร์ต Pre-Order (.xlsx)

@@ -11,6 +11,37 @@
 (function (window) {
   'use strict';
 
+  // Browser-safe XLSX download helper for xlsx-style (0.8.13)
+  function downloadWorkbookAsXlsx(wb, filename) {
+    if (typeof XLSX === 'undefined') return;
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: false, type: 'binary' });
+    const buf = new Uint8Array(wbout.length);
+    for (let i = 0; i < wbout.length; i++) {
+      buf[i] = wbout.charCodeAt(i) & 0xFF;
+    }
+    if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof document !== 'undefined' && document.createElement) {
+      const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'QueenCosy_Export.xlsx';
+      if (document.body) document.body.appendChild(a);
+      if (typeof a.click === 'function') a.click();
+      setTimeout(() => {
+        try {
+          if (a.parentNode) a.parentNode.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (_) {}
+      }, 600);
+    }
+    return buf;
+  }
+
+  if (typeof window !== 'undefined' && window.XLSX) {
+    window.XLSX.writeFile = downloadWorkbookAsXlsx;
+  }
+  window.downloadWorkbookAsXlsx = downloadWorkbookAsXlsx;
+
   // =========================================================================
   // 1. MASTER DEFINITIONS FOR ADMIN ROUTINE MATRIX
   // =========================================================================
@@ -419,10 +450,14 @@
   function computeRoundTotals(round) {
     const mode = round.formulaMode || 'STANDARD';
     const modelQtyTotals = {};
+    const modelYardsTotals = {};
     const modelWageTotals = {};
+    const modelCutWageTotals = {};
     ROUTINE_MODELS.forEach(m => {
       modelQtyTotals[m.key] = 0;
+      modelYardsTotals[m.key] = 0;
       modelWageTotals[m.key] = 0;
+      modelCutWageTotals[m.key] = 0;
     });
 
     let grandTotalUnits = 0;
@@ -463,6 +498,7 @@
       ROUTINE_MODELS.forEach(mod => {
         const qty = mod.key === 'lmini' ? m.lminiTotal : Number(row[mod.key] || 0);
         modelQtyTotals[mod.key] += qty;
+        modelYardsTotals[mod.key] = Math.round((modelYardsTotals[mod.key] + Number(m.modelYards[mod.key] || 0)) * 100) / 100;
       });
 
       if (groupSummary[row.group]) {
@@ -474,12 +510,15 @@
 
     ROUTINE_MODELS.forEach(mod => {
       modelWageTotals[mod.key] = modelQtyTotals[mod.key] * mod.cutWage;
+      modelCutWageTotals[mod.key] = modelWageTotals[mod.key];
       grandTotalCutWage += modelWageTotals[mod.key];
     });
 
     return {
       modelQtyTotals,
+      modelYardsTotals,
       modelWageTotals,
+      modelCutWageTotals,
       grandTotalUnits,
       grandTotalUsedYards,
       grandTotalCalcRolls,
@@ -514,7 +553,8 @@
     ensureState() {
       if (!this.store.state.adminRoutine || !Array.isArray(this.store.state.adminRoutine.rounds)) {
         this.store.state.adminRoutine = getInitialAdminRoutineData();
-        this.store.saveCutterState();
+        // Save locally only; NEVER push seed data to Cloud before initial Cloud sync completes!
+        this.store.saveCutterState(false);
       }
     },
 
@@ -529,7 +569,13 @@
     },
 
     save() {
-      this.store.saveCutterState();
+      const nowIso = new Date().toISOString();
+      if (this.store && this.store.state && this.store.state.adminRoutine) {
+        this.store.state.adminRoutine.updatedAt = nowIso;
+        const activeRound = this.getActiveRound();
+        if (activeRound) activeRound.updatedAt = nowIso;
+      }
+      this.store.saveCutterState(true);
     },
 
     fmt(n, dec = 2) {
@@ -1973,18 +2019,18 @@
         statusEl.className = 'mt-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center justify-between';
         statusEl.innerHTML = `
           <span>✅ อัปโหลดไฟล์ <strong>${fileNames}</strong> สำเร็จ! ดึงยอดรวม <strong>${this.fmt(totalParsedUnits, 0)} ชุด</strong> (${modelKeys.length} รุ่น) คำนวณหลา/ขา/เกียร์เรียบร้อย</span>
-          <span class="text-[11px] text-indigo-700 font-bold">กดปุ่ม "🚀 ส่งยอด Pre-Order นี้ไปตั้งต้นใบเบิกผ้า (Tab 1 & Tab 2)" ได้ทันที</span>
+          <span class="text-[11px] text-indigo-700 font-bold">กดปุ่ม "⚡ ส่งยอด Pre-Order เข้าใบเบิกผ้า (แท็บ 3)" ได้ทันที</span>
         `;
         statusEl.classList.remove('hidden');
       }
       this.toast(`อัปโหลด Pre-Order สำเร็จ (${this.fmt(totalParsedUnits, 0)} ชุด)!`);
     },
 
-    // Push current Tab 3 Pre-Order records directly into Tab 1 (Active Cutting Round) & Tab 2 (Cut-Sew Stock preOrder)
+    // Push current Tab 2 Pre-Order records directly into Tab 3 (Active Cutting Round) & Tab 1 (Cut-Sew Stock preOrder)
     pushPreOrderRecordsToTab1AndTab2() {
       const records = this.data.preOrderDailyRecords || [];
       if (records.length === 0) {
-        this.toast('ยังไม่มีข้อมูล Pre-Order ในตารางที่จะส่งไป Tab 1', '⚠️');
+        this.toast('ยังไม่มีข้อมูล Pre-Order ในตารางที่จะส่งไปใบเบิกผ้า (แท็บ 3)', '⚠️');
         return;
       }
       const round = this.getActiveRound();
@@ -2051,7 +2097,7 @@
       if (typeof window.switchFabricTab === 'function') {
         window.switchFabricTab('tab-admin-routine');
       }
-      this.toast(`ส่งยอด Pre-Order รวม ${this.fmt(totalPushed, 0)} ชุด เข้าใบเบิกผ้า & ใบสั่งตัดนอก (Tab 1) เรียบร้อย!`);
+      this.toast(`ส่งยอด Pre-Order รวม ${this.fmt(totalPushed, 0)} ชุด เข้าสต็อกผ้าตัด-เย็บ (แท็บ 1) และใบเบิกผ้า & ใบสั่งตัดนอก (แท็บ 3) เรียบร้อย!`);
     },
 
     // Download clean styled Pre-Order Excel template for Admin to fill & drag-drop
@@ -2143,11 +2189,11 @@
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'PreOrder_Template');
-      XLSX.writeFile(wb, 'QueenCosy_เทมเพรสอัปโหลด_PreOrder.xlsx');
+      downloadWorkbookAsXlsx(wb, 'QueenCosy_เทมเพรสอัปโหลด_PreOrder.xlsx');
       this.toast('ดาวน์โหลดเทมเพรส Pre-Order สำเร็จ!');
     },
 
-    // Export Tab 3 Pre-Order Report & Monthly Billing to Styled Excel
+    // Export Tab 2 Pre-Order Report & Monthly Billing to Styled Excel
     exportPreOrderReportExcel() {
       if (typeof XLSX === 'undefined') {
         this.toast('ไม่พบไลบรารี XLSX', '⚠️');
@@ -2247,7 +2293,7 @@
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'สรุป_PreOrder_ขา_เกียร์');
-      XLSX.writeFile(wb, `QueenCosy_รีพอร์ต_PreOrder_ขาเกียร์_${new Date().toISOString().split('T')[0]}.xlsx`);
+      downloadWorkbookAsXlsx(wb, `QueenCosy_รีพอร์ต_PreOrder_ขาเกียร์_${new Date().toISOString().split('T')[0]}.xlsx`);
       this.toast('ส่งออกรีพอร์ต Pre-Order (.xlsx) สำเร็จ!');
     },
 
@@ -2327,7 +2373,7 @@
     // -----------------------------------------------------------------------
     // STYLED EXCEL EXPORT MATCHING THE WEB SYSTEM UI (Sheet 1 & Sheet 2 Synced)
     // -----------------------------------------------------------------------
-    exportActiveRoundToExcel() {
+    exportActiveRoundToExcel(activeSheetIndex = 0) {
       if (typeof XLSX === 'undefined') {
         this.toast('ไม่พบไลบรารี XLSX สำหรับส่งออกไฟล์', '⚠️');
         return;
@@ -2491,7 +2537,7 @@
       // Footer Row 2: ราคาค่าแรงตัด / ตัว (บาท)
       aoa1.push([
         'ราคาค่าแรงตัด / ตัว (บาท)', '', '',
-        45, '', 55, '', 20, '', 70, '', 80, '', 70, '', 70, '', 90, 90, '', 100, '',
+        10, '', 10, '', 8, '', 20, '', 20, '', 20, '', 20, '', 30, 30, '', 30, '',
         '', '', '', '', '', '', '', '', '', '', ''
       ]);
 
@@ -2845,7 +2891,9 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws1, s1Name);
       XLSX.utils.book_append_sheet(wb, ws2, '2_ใบสั่งตัดนอก');
-      XLSX.writeFile(wb, `QueenCosy_ใบเบิกผ้าและสั่งตัดนอก_${round.calcDate || 'export'}.xlsx`);
+      wb.Workbook = { Views: [{ activeTab: activeSheetIndex === 1 ? 1 : 0 }] };
+      const filePrefix = activeSheetIndex === 1 ? 'QueenCosy_ใบสั่งตัดนอก_และใบเบิกผ้า' : 'QueenCosy_ใบเบิกผ้าและสั่งตัดนอก';
+      downloadWorkbookAsXlsx(wb, `${filePrefix}_${round.calcDate || 'export'}.xlsx`);
       this.toast('ส่งออกไฟล์ Excel แบบตารางสีเหมือนหน้าระบบ (ซิงค์ชีท 1 & ชีท 2) สำเร็จ!');
     },
 
@@ -2887,7 +2935,7 @@
         this.renderMatrixTab();
       });
 
-      // Action buttons in Tab 1 & View 2
+      // Action buttons in Tab 3 (Routine Matrix & View 2 Outsource)
       document.getElementById('btn-routine-new-round')?.addEventListener('click', () => {
         this.createNewRoundFromCurrent();
       });
@@ -2898,10 +2946,10 @@
         this.syncActiveRoundToStockAndCutter();
       });
       document.getElementById('btn-routine-export-excel')?.addEventListener('click', () => {
-        this.exportActiveRoundToExcel();
+        this.exportActiveRoundToExcel(0);
       });
       document.getElementById('btn-outsource-export-excel')?.addEventListener('click', () => {
-        this.exportActiveRoundToExcel();
+        this.exportActiveRoundToExcel(1);
       });
       document.getElementById('btn-outsource-autofill-rolls')?.addEventListener('click', () => {
         this.autoFillOutsourceRolls();
